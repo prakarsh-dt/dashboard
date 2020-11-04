@@ -14,6 +14,9 @@ const AppDetailsPage = lazy(() => import('../app/details/main'));
 const AppListContainer = lazy(() => import('../app/list/AppListContainer'));
 const GlobalConfig = lazy(() => import('../globalConfigurations/GlobalConfiguration'));
 const BulkActions = lazy(() => import('../deploymentGroups/BulkActions'));
+const AuditLogs = lazy(() => import('../auditLogs/AuditLogs'));
+
+
 
 export default function NavigationWrapper() {
     const history = useHistory()
@@ -65,6 +68,7 @@ export default function NavigationWrapper() {
                     <ErrorBoundary>
                         <Switch>
                             <Route path={URLS.APP} render={() => <AppRouter />} />
+                            <Route path={URLS.AUDIT_LOGS} render={props => <AuditLogs {...props} />} />
                             <Route path={URLS.CHARTS} render={() => <Charts />} />
                             <Route path={URLS.GLOBAL_CONFIG} render={props => <GlobalConfig {...props} />} />
                             <Route path={URLS.DEPLOYMENT_GROUPS} render={props => <BulkActions {...props} />} />

@@ -27,6 +27,7 @@ export const URLS = {
     APP_CD_CONFIG: 'cd-pipeline',
     APP_EXTERNAL_CI_CONFIG: 'external-ci',
     APP_LINKED_CI_CONFIG: 'linked-ci',
+    AUDIT_LOGS: '/audit-logs',
     // APP_COMPOSE: '/app/edit', //
     LOGIN: '/login', //
     DEVTRON_LOGIN: '/login-dt',

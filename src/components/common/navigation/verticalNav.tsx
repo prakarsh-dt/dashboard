@@ -36,6 +36,12 @@ const navigationList = [
 		href: `${URLS.GLOBAL_CONFIG}`,
 		iconClass: 'nav-short-global'
 	},
+	{
+        title: 'Audit Logs',
+        href: `${URLS.AUDIT_LOGS}`,
+        iconClass: 'nav-audit-logs'
+    },
+
 ];
 
 export default class VerticalNav extends Component<RouteComponentProps<{}>, { loginInfo: any; showLogoutCard: boolean; }> {
