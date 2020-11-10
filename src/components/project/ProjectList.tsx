@@ -47,6 +47,7 @@ export default class ProjectList extends Component<{}, ProjectListState>  {
 
     handleChange(event, index: number, key: 'name'): void {
         let { projects, isValid, errorMessage } = { ...this.state };
+        console.log({...this.state})
         if (event.target.value && event.target.value.length > 2) {
             isValid[key] = true;
             errorMessage[key] = "";

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ButtonWithLoader } from '../../components/common';
 import folder from '../../assets/icons/ic-folder.svg';
+import List from 'react-virtualized';
 
 export interface ProjectProps {
     id: number;
