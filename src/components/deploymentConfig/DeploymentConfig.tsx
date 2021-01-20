@@ -31,7 +31,7 @@ export default function DeploymentConfig({ respondOnSuccess }) {
     return <div className="form__app-compose">
         <h3 className="form__title form__title--artifatcs">Deployment Template</h3>
         <p className="form__subtitle">Required to execute deployment pipelines for this application.&nbsp;
-            <a rel="noreferrer noopener" href="https://docs.devtron.ai/docs/reference/creating-application/deployment-template/" target="_blank">Learn more about Deployment Template Configurations</a>
+            <a rel="noreferrer noopener" href="https://docs.devtron.ai/creating-application/deployment-template" target="_blank">Learn more about Deployment Template Configurations</a>
         </p>
         <DeploymentConfigForm respondOnSuccess={respondOnSuccess} />
     </div>
@@ -162,6 +162,7 @@ function DeploymentConfigForm({ respondOnSuccess }) {
             toggleConfirmation(false)
         }
     }
+    const appMetricsEnvironmentVariableEnabled = window._env_ && window._env_.APPLICATION_METRICS_ENABLED;
     return (
         <>
             <form action="" className="white-card white-card__deployment-config" onSubmit={handleSubmit}>
@@ -219,7 +220,7 @@ function DeploymentConfigForm({ respondOnSuccess }) {
                     <button type="button" className="cta" onClick={e => save()}>{loading ? <Progressing /> : chartConfig.id ? 'Update' : 'Save'}</button>
                 </ConfirmationDialog.ButtonGroup>
             </ConfirmationDialog>}
-            {chartVersions && selectedChart &&
+            {chartVersions && selectedChart && appMetricsEnvironmentVariableEnabled && 
                 <OptApplicationMetrics
                     currentVersion={selectedChart?.version}
                     minimumSupportedVersion={"3.7.0"}

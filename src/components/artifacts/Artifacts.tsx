@@ -3,12 +3,13 @@ import { getGitProviderListAuth, getSourceConfig } from '../../services/service'
 import { createMaterial, updateMaterial } from './service';
 import { toast } from 'react-toastify';
 import { ErrorScreenManager, Progressing, ButtonWithLoader } from '../common';
-import { AppConfigStatus, ViewType } from '../../config';
+import { AppConfigStatus, URLS, ViewType } from '../../config';
 import { ValidationRules } from './validationRules';
 import { ArtifactsProps, Material, ArtifactsState } from './types';
 import { ReactComponent as Add } from '../../assets/icons/ic-add.svg';
-import { withRouter } from 'react-router';
 import { ReactComponent as Check } from '../../assets/icons/ic-check.svg';
+import { withRouter } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import down from '../../assets/icons/appstatus/ic-dropdown.svg';
 import error from '../../assets/icons/misc/errorInfo.svg';
 import ReactSelect, { components } from 'react-select';
@@ -267,11 +268,11 @@ class Artifacts extends Component<ArtifactsProps, ArtifactsState> {
         return <>
             <h1 className="form__title form__title--artifacts">Git Materials</h1>
             <p className="form__subtitle form__subtitle--artifacts">Manage source code repositories for this application.&nbsp;
-                 <a rel="noreferrer noopener" href="https://docs.devtron.ai/docs/reference/creating-application/git-material/" target="_blank" className="">Learn more about Git Material</a>
+                 <a rel="noreferrer noopener" href="https://docs.devtron.ai/creating-application/git-material" target="_blank" className="">Learn more about Git Material</a>
             </p>
         </>
     }
-    
+
     renderMaterial(material, index) {
         if (material.isCollapsed) {
             let provider = material.providers.find(prov => prov.active);
@@ -313,7 +314,8 @@ class Artifacts extends Component<ArtifactsProps, ArtifactsState> {
                                 ...base,
                                 border: state.isFocused ? '1px solid #0066CC' : '1px solid #d6dbdf',
                                 boxShadow: 'none',
-                                height: '56px'
+                                fontWeight: 'normal',
+                                height: "40px"
                             }),
                             option: (base, state) => ({
                                 ...base,
@@ -330,7 +332,16 @@ class Artifacts extends Component<ArtifactsProps, ArtifactsState> {
                                     {props.isSelected ? <Check className="icon-dim-16 vertical-align-middle scb-5 mr-8" /> : <span className="inline-block icon-dim-16 mr-8"></span>}
                                     {props.label}
                                 </components.Option>
-                            }
+                            },
+                            MenuList: (props) => {
+                                return <components.MenuList {...props}>
+                                    {props.children}
+                                    <NavLink to={`${URLS.GLOBAL_CONFIG_GIT}`} className="react-select__bottom p-10 cb-5 block fw-5 anchor cursor no-decor">
+                                        <Add className="icon-dim-20 mr-5 fcb-5 mr-12 vertical-align-bottom" />
+                                        Add Git Provider
+                                    </NavLink>
+                                </components.MenuList>
+                            },
                         }}
                         onChange={(selected) => { this.selectProvider(selected, material.id) }} />
                     <span className="form__error">
@@ -340,7 +351,7 @@ class Artifacts extends Component<ArtifactsProps, ArtifactsState> {
 
                 <label className="form__row">
                     <span className="form__label">Git Repo URL*</span>
-                    <input className="form__input" placeholder="e.g. https://gitlab.com/abc/xyz.git" type="text" value={material.url}
+                    <input autoComplete="off" className="form__input" placeholder="e.g. https://gitlab.com/abc/xyz.git" type="text" value={material.url}
                         tabIndex={index + 2} onChange={(event) => { this.handleChange(event, material.id, 'url') }} />
                     <span className="form__error">
                         {showError && !errorObject[1].isValid ? <img src={error} className="form__icon" /> : null}{errorObject[1].message}
@@ -349,7 +360,7 @@ class Artifacts extends Component<ArtifactsProps, ArtifactsState> {
 
                 <label className="form__row">
                     <label className="form__label">Checkout Path(*Required If you’re using multiple Git Materials)</label>
-                    <input className="form__input" placeholder="e.g. /abc" tabIndex={index + 3} type="text" value={material.checkoutPath}
+                    <input autoComplete="off" className="form__input" placeholder="e.g. /abc" tabIndex={index + 3} type="text" value={material.checkoutPath}
                         onChange={(event) => { this.handleChange(event, material.id, 'checkoutPath') }} />
                     <span className="form__error">
                         {showError && !errorObject[2].isValid ? <img src={error} className="form__icon" /> : null}{errorObject[2].message}

@@ -158,7 +158,7 @@ function HeaderSection() {
         <div className="auth-page__header">
             <h1 className="form__title">User access</h1>
             <p className="form__subtitle">Manage user permissions.&nbsp;
-                <a rel="noreferrer noopener" href="https://docs.devtron.ai/docs/reference/global-configurations/user-access/" target="_blank">Learn more about User Access</a>
+                <a rel="noreferrer noopener" href="https://docs.devtron.ai/global-configurations/user-access" target="_blank">Learn more about User Access</a>
             </p>
 
             <ul role="tablist" className="tab-list">
@@ -622,10 +622,10 @@ export const ChartPermission: React.FC<ChartPermissionRow> = React.memo(({ chart
 
     const chartGroupEditOptions: OptionType[] = useMemo(() => {
         if (chartPermission.action === ActionTypes.ADMIN) {
-            return [{ label: 'All charts', value: 'All charts' }]
+            return [{ label: 'All Chart Groups', value: 'All charts' }]
         }
         else {
-            return [{ label: 'Deny', value: 'Deny' }, { label: 'Specific Charts', value: 'Specific Charts' }]
+            return [{ label: 'Deny', value: 'Deny' }, { label: 'Specific Chart Groups', value: 'Specific Charts' }]
         }
     }, [chartPermission.action])
 
@@ -639,7 +639,7 @@ export const ChartPermission: React.FC<ChartPermissionRow> = React.memo(({ chart
                 <input type="checkbox" checked disabled />
                 <input type="checkbox" checked={chartPermission.action === ActionTypes.ADMIN} onChange={handleChartCreateChange} />
                 <Select
-                    value={chartPermission.action === ActionTypes.ADMIN ? chartGroupEditOptions[0] : chartPermission.action === ActionTypes.VIEW ? { label: 'Deny', value: 'Deny' } : { label: 'Specific Charts', value: 'Specific Charts' }}
+                    value={chartPermission.action === ActionTypes.ADMIN ? chartGroupEditOptions[0] : chartPermission.action === ActionTypes.VIEW ? { label: 'Deny', value: 'Deny' } : { label: 'Specific Chart Groups', value: 'Specific Charts' }}
                     isDisabled={chartPermission.action === ActionTypes.ADMIN}
                     options={chartGroupEditOptions}
                     className="basic-multi-select"
@@ -657,6 +657,7 @@ export const ChartPermission: React.FC<ChartPermissionRow> = React.memo(({ chart
             {chartPermission.action === ActionTypes.UPDATE &&
                 <Select
                     value={chartPermission.entityName}
+                    placeholder="Select Chart Group"
                     isMulti
                     styles={{
                         ...multiSelectStyles,
