@@ -11,7 +11,10 @@ import { URLS } from '../../../config';
 import { App, AppListState, OrderBy, SortBy } from './types';
 import { ReactComponent as Edit } from '../../../assets/icons/ic-settings.svg';
 import { ReactComponent as Info } from '../../../assets/icons/ic-info-outline.svg';
+import { ReactComponent as Search } from '../../../assets/icons/ic-search.svg';
+import { ReactComponent as Clear } from '../../../assets/icons/ic-error.svg';
 import { TriggerInfoModal } from './TriggerInfo';
+
 const APP_LIST_PARAM = {
     createApp: 'create-app',
 }
@@ -100,10 +103,10 @@ export class AppListView extends Component<AppListViewProps>{
         return <div className="search-filter-section">
             <form style={{ display: "inline" }} onSubmit={this.props.search}>
                 <div className="search">
-                    <span className="search__icon"><i className="fa fa-search" aria-hidden="true"></i></span>
-                    <input type="text" placeholder="Search apps" className="search__input search__input--app-list" value={this.props.searchQuery} onChange={this.props.handleSearchStr} />
+                    <Search className="search__icon icon-dim-18" />
+                    <input type="text" placeholder="Search apps" className="search__input bcn-1" value={this.props.searchQuery} onChange={this.props.handleSearchStr} />
                     {this.props.searchApplied ? <button className="search__clear-button" type="button" onClick={this.props.clearSearch}>
-                        <i className="fa fa-times-circle" aria-hidden="true"></i>
+                        <Clear className="icon-dim-18 icon-n4 vertical-align-middle" />
                     </button> : null}
                 </div>
             </form>
@@ -240,11 +243,10 @@ export class AppListView extends Component<AppListViewProps>{
         else if (this.props.view === AppListViewType.EMPTY) {
             return <React.Fragment>
                 {this.renderPageHeader()}
-                {this.props.isDockerRegistryEmpty && <p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
-                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom" />
-                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Configure docker registry </Link>
-                    to setup a new application.&nbsp;
-                    <a href="https://docs.devtron.ai/user-guide/global-configurations/docker-registries" target="_blank" rel="noreferrer noopener" className="cb-5 anchor">Learn how to configure docker registry.</a>
+                {this.props.isDockerRegistryEmpty &&<p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
+                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom mr-8" />
+                    Docker registry configuration is required to setup a new application. 
+                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Click here to configure docker registry.</Link>
                 </p>}
                 {this.renderRouter()}
                 <Empty view={this.props.view}
@@ -257,11 +259,10 @@ export class AppListView extends Component<AppListViewProps>{
         else if (this.props.view === AppListViewType.NO_RESULT) {
             return <React.Fragment>
                 {this.renderPageHeader()}
-                {this.props.isDockerRegistryEmpty && <p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
-                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom" />
-                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Configure docker registry </Link>
-                    to setup a new application.&nbsp;
-                    <a href="https://docs.devtron.ai/user-guide/global-configurations/docker-registries" target="_blank" rel="noreferrer noopener" className="cb-5 anchor">Learn how to configure docker registry.</a>
+                {this.props.isDockerRegistryEmpty &&<p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
+                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom mr-8" />
+                    Docker registry configuration is required to setup a new application. 
+                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Click here to configure docker registry.</Link>
                 </p>}
                 {this.renderSavedFilters()}
                 {this.renderRouter()}
@@ -281,11 +282,10 @@ export class AppListView extends Component<AppListViewProps>{
         else {
             return <React.Fragment>
                 {this.renderPageHeader()}
-                {this.props.isDockerRegistryEmpty && <p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
-                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom" />
-                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Configure docker registry </Link>
-                    to setup a new application.&nbsp;
-                    <a href="https://docs.devtron.ai/user-guide/global-configurations/docker-registries" target="_blank" rel="noreferrer noopener" className="cb-5 anchor">Learn how to configure docker registry.</a>
+                {this.props.isDockerRegistryEmpty &&<p className="m-0 pt-10 pb-10 pl-24 pr-24 cn-9 bcb-1 fw-5 fs-13">
+                    <Info className="icon-dim-20 fcb-5 vertical-align-bottom mr-8" />
+                    Docker registry configuration is required to setup a new application. 
+                    &nbsp;<Link to="/global-config/docker" className="cb-5 anchor">Click here to configure docker registry.</Link>
                 </p>}
                 {this.renderRouter()}
                 {this.renderSavedFilters()}

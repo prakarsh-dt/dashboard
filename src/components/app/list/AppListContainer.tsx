@@ -3,9 +3,8 @@ import React, { Component } from 'react';
 import { getInitState, appListModal } from './appList.modal';
 import { ServerErrors } from '../../../modals/commonTypes';
 import { App, AppListProps, AppListState, OrderBy, SortBy } from './types';
-import { URLS, ViewType, getNextStageURL } from '../../../config';
+import { URLS, ViewType } from '../../../config';
 import { AppListView } from './AppListView';
-import { getAppConfigStatus } from '../../../services/service';
 import { getAppList } from '../service';
 import { FilterOption, showError } from '../../common';
 import { AppListViewType } from '../config';
@@ -13,6 +12,8 @@ import * as queryString from 'query-string';
 import { withRouter } from 'react-router-dom';
 
 class AppListContainer extends Component<AppListProps, AppListState>{
+    abortController: AbortController;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -42,7 +43,6 @@ class AppListContainer extends Component<AppListProps, AppListState>{
     }
 
     componentDidMount() {
-
         let payload = this.createPayloadFromURL(this.props.location.search);
         getInitState(payload).then((response) => {
             let view;
@@ -53,15 +53,21 @@ class AppListContainer extends Component<AppListProps, AppListState>{
                 view = response.apps.length ? AppListViewType.LIST : AppListViewType.EMPTY;
             }
             this.setState({ ...response, view });
-        }).catch((errors: ServerErrors) => {
+        }).then(()=>{
+            let payload = this.createPayloadFromURL(this.props.location.search);
+            this.getAppList(payload);
+        })
+        .catch((errors: ServerErrors) => {
             showError(errors);
             this.setState({ view: AppListViewType.ERROR, code: errors.code });
         })
     }
 
-    componentWillReceiveProps(nextProps) {
-        let payload = this.createPayloadFromURL(nextProps.location.search)
-        if (nextProps.location.search !== this.props.location.search) this.getAppList(payload);
+    componentDidUpdate(nextProps) {
+        if (nextProps.location.search !== this.props.location.search) {
+            let payload = this.createPayloadFromURL(this.props.location.search);
+            this.getAppList(payload);
+        }
     }
 
     createPayloadFromURL(searchQuery: string) {
@@ -297,7 +303,14 @@ class AppListContainer extends Component<AppListProps, AppListState>{
         state.expandedRow = false;
         state.appData = null;
         this.setState(state);
-        getAppList(request).then((response) => {
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
+
+        this.abortController = new AbortController();
+
+        getAppList(request, { signal: this.abortController.signal }).then((response) => {
             let state = { ...this.state };
             state.code = response.code;
             state.apps = (response.result && !!response.result.appContainers) ? appListModal(response.result.appContainers) : [];
@@ -306,27 +319,25 @@ class AppListContainer extends Component<AppListProps, AppListState>{
             state.size = response.result.appCount;
             state.pageSize = request.size;
             this.setState(state);
+            this.abortController = null;
         }).catch((errors: ServerErrors) => {
-            showError(errors);
-            this.setState({ code: errors.code, view: ViewType.ERROR });
+            if (errors.code) {
+                showError(errors);
+                this.setState({ code: errors.code, view: ViewType.ERROR });
+            }
         })
     }
 
     handleEditApp = (appId: number): void => {
-        getAppConfigStatus(appId).then((response) => {
-            let url = getNextStageURL(response.result, appId.toString());
-            this.props.history.push(url);
-        }).catch((errors: ServerErrors) => {
-            showError(errors);
-            this.setState({ view: AppListViewType.LIST, code: errors.code });
-        })
+        let url = `/app/${appId}/edit`;
+        this.props.history.push(url);
     }
 
     redirectToAppDetails = (app, envId: number): string => {
         if (envId) {
-            return `${this.props.match.url}/${app.id}/details/${envId}`
+            return `${this.props.match.url}/${app.id}/details/${envId}`;
         }
-        return `${this.props.match.url}/${app.id}/trigger`
+        return `${this.props.match.url}/${app.id}/trigger`;
     }
 
     closeModal = () => {
