@@ -17,9 +17,9 @@ export const statusColor = {
     starting: "#FF7E5B",
     succeeded: '#1dad70',
     running: '#FF7E5B',
-    failed: '#f33e3e',
-    cancelled: '#767d84',
-    aborted: '#767d84',
+    failed: 'var(--R500)',
+    cancelled: 'var(--N500)',
+    aborted: 'var(--N500)',
 }
 
 export const statusIcon = {

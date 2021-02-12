@@ -19,6 +19,7 @@
         "monaco-editor": "^0.19.3",
         "monaco-editor-webpack-plugin": "^1.8.2",
         "monaco-yaml": "^2.1.0",
+        "openapi-typescript-codegen": "^0.8.1",
         "patternfly-react": "^2.30.3",
         "prop-types": "^15.7.1",
         "query-string": "^6.8.2",
@@ -43,6 +44,7 @@
     },
     "scripts": {
         "precommit": "yarn eslint",
+        "generate": "openapi --input ./specs/spec.yaml --output ./modals",
         "lint": "eslint src/**/*.tsx",
         "lint-fix": "eslint --fix src/**/*.tsx",
         "start": "react-app-rewired start",
