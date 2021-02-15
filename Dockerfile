@@ -3,7 +3,7 @@ FROM node AS builder
 WORKDIR /app
 COPY package.json .
 RUN yarn install
-
+RUN yarn generate
 COPY src/ src
 COPY types/ types
 COPY nginx.conf .

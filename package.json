@@ -44,7 +44,7 @@
     },
     "scripts": {
         "precommit": "yarn eslint",
-        "generate": "openapi --input ./specs/spec.yaml --output ./modals",
+        "generate": "openapi --input ./specs/* --output ./typescript/",
         "lint": "eslint src/**/*.tsx",
         "lint-fix": "eslint --fix src/**/*.tsx",
         "start": "react-app-rewired start",
