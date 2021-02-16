@@ -19,7 +19,7 @@
         "monaco-editor": "^0.19.3",
         "monaco-editor-webpack-plugin": "^1.8.2",
         "monaco-yaml": "^2.1.0",
-        "openapi-typescript-codegen": "^0.8.1",
+        "openapi-typescript": "^3.0.1",
         "patternfly-react": "^2.30.3",
         "prop-types": "^15.7.1",
         "query-string": "^6.8.2",
@@ -43,8 +43,9 @@
         "yamljs": "^0.3.0"
     },
     "scripts": {
+        "generate:specs": "yarn run generate:specs:one",
+        "generate:specs:one": "yarn openapi-typescript ./specs/security.yaml -o one.ts",
         "precommit": "yarn eslint",
-        "generate": "openapi --input ./specs/* --output ./typescript/",
         "lint": "eslint src/**/*.tsx",
         "lint-fix": "eslint --fix src/**/*.tsx",
         "start": "react-app-rewired start",
