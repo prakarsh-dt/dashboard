@@ -11,6 +11,7 @@ import { Security } from '../../security/Security';
 const Charts = lazy(() => import('../../charts/Charts'));
 const AppDetailsPage = lazy(() => import('../../app/details/main'));
 const AppListContainer = lazy(() => import('../../app/list/AppListContainer'));
+const ClusterAndNode = lazy(() => import('../../clusterAndNodes/ClusterAndNode'));
 const GlobalConfig = lazy(() => import('../../globalConfigurations/GlobalConfiguration'));
 const BulkActions = lazy(() => import('../../deploymentGroups/BulkActions'));
 
@@ -64,6 +65,7 @@ export default function NavigationRoutes() {
                         <Switch>
                             <Route path={URLS.APP} render={() => <AppRouter />} />
                             <Route path={URLS.CHARTS} render={() => <Charts />} />
+                            <Route path={URLS.CLUSTER_NODE} render={(props) => <ClusterAndNode />} />
                             <Route path={URLS.GLOBAL_CONFIG} render={props => <GlobalConfig {...props} />} />
                             <Route path={URLS.DEPLOYMENT_GROUPS} render={props => <BulkActions {...props} />} />
                             <Route path={URLS.SECURITY} render={(props) => <Security {...props} />} />

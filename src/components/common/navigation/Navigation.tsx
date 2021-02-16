@@ -31,6 +31,12 @@ const NavigationList = [
 		href: URLS.CHARTS,
 	},
 	{
+		title: 'Cluster and Nodes',
+		type: 'link',
+		iconClass: 'nav-short-helm',
+		href: URLS.CLUSTER_NODE,
+	},
+	{
 		title: 'Deployment Groups',
 		type: 'link',
 		iconClass: 'nav-short-bulk-actions',
