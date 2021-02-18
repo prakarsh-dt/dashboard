@@ -1,0 +1,15 @@
+.cluster__add-button:focus{
+    border: 0px;
+    outline: none;
+}
+
+.cluster__search{
+    border: none;
+}
+.table__row-head {
+    border-bottom: 1px solid #d0d4d9;
+}
+
+
+
+
