@@ -33,7 +33,7 @@ const NavigationList = [
 	{
 		title: 'Cluster and Nodes',
 		type: 'link',
-		iconClass: 'nav-short-helm',
+		iconClass: 'nav-short-cluster',
 		href: URLS.CLUSTER_NODE,
 	},
 	{
