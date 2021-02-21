@@ -1,17 +1,19 @@
-.cluster__add-button:focus{
-    border: 0px;
-    outline: none;
-}
+
 
 .cluster__search{
     border: none;
 }
+
 .table__row-head {
     border-bottom: 1px solid #d0d4d9;
 }
 
+.cluster__data-25{
+    width: 25%;;
+}
+
 .cluster__data{
-    width: 18%;
+    width: 16%;
 }
 
 .cluster__alert{

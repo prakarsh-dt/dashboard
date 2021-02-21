@@ -125,7 +125,7 @@ export class ClusterList extends Component<{}, any> {
     }
 
     renderClusterTable() {
-        return <table className="pl-20 w-100 mt-21">
+        return <><table className="pl-20 w-100 mt-21">
             <tbody>
                 <tr className="table__row-head">
                     <th className="pt-11 pl-20 pb-11 w-16 cn-5 fs-12 fw-6 lh-1.5">CLUSTER NAME</th>
@@ -138,8 +138,9 @@ export class ClusterList extends Component<{}, any> {
                 </tr>
             </tbody>
             <ClusterCollapsed />
-            <ClusterExpanded />
         </table>
+            <ClusterExpanded />
+        </>
     }
 
     render() {
