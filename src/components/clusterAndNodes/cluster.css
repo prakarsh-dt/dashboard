@@ -1,4 +1,6 @@
-
+.cluster__add-button{
+    border: none;
+}
 
 .cluster__search{
     border: none;
@@ -19,6 +21,4 @@
 .cluster__alert{
     color: #9a6000;
 }
-
-
 

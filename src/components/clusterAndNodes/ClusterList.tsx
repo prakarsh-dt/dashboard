@@ -153,7 +153,7 @@ export class ClusterList extends Component<{}, any> {
                 <input className="cluster__search pl-8 pt-6 pb-6 br-4 fs-13 bcn-1 w-100" type="text" placeholder="Search nodes by label, taint, role, annotations, schedulable (eg. label:diskType=gp2)" />
             </form>
             <button className="cluster__add-button bcn-0 ml-20 cb-5 flex left" type="button" onClick={this.toggleAddFilter}>
-                Add Filter<Add className="icon-dim-20 fcb-5 pt-5" />
+                Add Filter<Add className="icon-dim-16 fcb-5" />
             </button>
             {this.renderAddFilter()}
             {this.renderClusterTable()}

@@ -29,6 +29,28 @@ export class ClusterExpanded extends Component<{}, {}> {
             <td className="cluster__data pt-15 pb-15 cn-9 ">40%</td>
             <td className="cluster__data pt-15 pb-15 cn-9 ">30%</td>
         </tr>
+        <tr className="">
+            <td className="cluster__data-25 pl-20 pt-15 pb-15 cn-9">ip-172-31-2-152.us-east-2.compute.internal</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 cg-5 ">Ready</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 "> master</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">40%</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">30%</td>
+        </tr>
+        <tr className="">
+            <td className="cluster__data-25 pl-20 pt-15 pb-15 cn-9">ip-172-31-2-152.us-east-2.compute.internal</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 cg-5 ">Ready</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 "> master</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">40%</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">30%</td>
+        </tr>
+        <div className=""></div>
+        <tr className="">
+            <td className="cluster__data-25 pl-20 pt-15 pb-15 cn-9">ip-172-31-2-152.us-east-2.compute.internal</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 cg-5 ">Ready</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 "> master</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">40%</td>
+            <td className="cluster__data pt-15 pb-15 cn-9 ">30%</td>
+        </tr>
     </>
 
     }
