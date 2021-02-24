@@ -17,7 +17,7 @@
   },
   "github": {
     "config": {
-      "type": "github",
+      "type": "oidc",
       "id": "github",
       "name": "GitHub",
       "config": {
@@ -44,7 +44,7 @@
   },
   "microsoft": {
     "config": {
-      "type": "microsoft",
+      "type": "oidc",
       "id": "microsoft",
       "name": "Microsoft",
       "config": {
@@ -56,7 +56,7 @@
   },
   "ldap": {
     "config": {
-      "type": "ldap",
+      "type": "oidc",
       "name": "LDAP",
       "id": "ldap",
       "config": {
@@ -103,7 +103,7 @@
   },
   "openshift": {
     "config": {
-      "type": "openshift",
+      "type": "oidc",
       "id": "openshift",
       "name": "OpenShift",
       "config": {
