@@ -6,6 +6,8 @@ import { List, ProtectedInput } from '../globalConfigurations/GlobalConfiguratio
 import { toast } from 'react-toastify';
 import awsRegionList from '../common/awsRegionList.json'
 import { DOCUMENTATION } from '../../config';
+import Tippy from '@tippyjs/react';
+import { ReactComponent as Question } from '../../assets/icons/ic-help-outline.svg';
 
 const DockerRegistryType = [
     { label: 'docker hub', value: 'docker-hub' },
@@ -15,6 +17,7 @@ const DockerRegistryType = [
 
 export default function Docker({ ...props }) {
     const [loading, result, error, reload] = useAsync(getDockerRegistryList)
+
     if (loading && !result) return <Progressing pageLoader />
     if (error) {
         showError(error)
@@ -174,14 +177,7 @@ function DockerForm({ id, pluginId, registryUrl, registryType, awsAccessKeyId, a
             </div>
             {state.registryType.value === 'ecr' && <>
                 <div className="form__row">
-                    <div className="flex left column">
-                        <label htmlFor="" className="form__label">AWS region*</label>
-                        <Select rootClassName="form__input form__input--aws-region" name="awsRegion" onChange={customHandleChange} value={customState.awsRegion.value}>
-                            <Select.Button>{customState.awsRegion.value ? awsRegionMap.get(customState.awsRegion.value) : 'Select AWS region'}</Select.Button>
-                            {Array.from(awsRegionMap).map(([value, name]) => <Select.Option value={value} key={value}>{name}</Select.Option>)}
-                        </Select>
-                        {customState.awsRegion.error && <div className="form__error">{customState.awsRegion.error}</div>}
-                    </div>
+                    <CustomInput name="id" value={state.id.value} error={state.id.error} onChange={handleOnChange} label="Name*" disabled={!!id} autoComplete={"off"}/>
                 </div>
                 <div className="form__row form__row--two-third">
                     <CustomInput name="awsAccessKeyId" value={customState.awsAccessKeyId.value} error={customState.awsAccessKeyId.error} onChange={customHandleChange} label="Access key ID*" autoComplete={"off"} />
@@ -199,15 +195,8 @@ function DockerForm({ id, pluginId, registryUrl, registryType, awsAccessKeyId, a
                     <CustomInput name="username" value={customState.username.value} autoComplete={"off"} error={customState.username.error} onChange={customHandleChange} label="Username*" />
                     <ProtectedInput name="password" value={customState.password.value} error={customState.password.error} onChange={customHandleChange} label="Password*" type="password" />
                 </div>
-            </>}
-            <div className="form__row form__buttons">
-                <label htmlFor="" className="docker-default" onClick={isDefault ? () => { toast.success('Please mark another as default.') } : e => toggleDefault(t => !t)}>
-                    <input type="checkbox" name="default" checked={Isdefault} onChange={e => { }} />
-                    Set as default
-                </label>
-                <button className="cta cancel" type="button" onClick={e => toggleCollapse(t => !t)}>Cancel</button>
-                <button className="cta" type="submit" disabled={loading}>{loading ? <Progressing /> : 'Save'}</button>
-            </div>
-        </form>
+                </>}
+            </form>
+       
     )
 }
