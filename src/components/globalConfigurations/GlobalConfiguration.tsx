@@ -1,6 +1,6 @@
 import React, { lazy, useState, useEffect, Suspense } from 'react';
 import { Route, NavLink, Router, Switch, Redirect } from 'react-router-dom'
-import { useHistory, useLocation } from 'react-router';
+import { useHistory, useRouteMatch, useLocation } from 'react-router';
 import { URLS } from '../../config';
 import { Toggle, Progressing, ErrorBoundary } from '../common';
 import arrowTriangle from '../../assets/icons/appstatus/ic-dropdown.svg';
@@ -61,7 +61,6 @@ export default function GlobalConfiguration({ ...props }) {
         if (location.pathname.includes(URLS.GLOBAL_CONFIG_HOST_URL)) {
             getHostURLConfig();
         }
-
     }, [location.pathname])
 
     function getHostURLConfig() {
@@ -186,11 +185,11 @@ function Body({ getHostURLConfig, checkList }) {
         <Route path={URLS.GLOBAL_CONFIG_AUTH} render={(props) => {
             return <UserGroup />
         }} />
-        <Route path={URLS.GLOBAL_CONFIG_NOTIFIER} render={(props) => {
-            return <Notifier {...props} />
-        }} />
         <Route path={`${URLS.GLOBAL_CONFIG_NOTIFIER}/edit`} render={(props) => {
             return <AddNotification {...props} />
+        }} />
+        <Route path={URLS.GLOBAL_CONFIG_NOTIFIER} render={(props) => {
+            return <Notifier {...props} />
         }} />
         <Redirect to={URLS.GLOBAL_CONFIG_HOST_URL} />
     </Switch>
@@ -247,11 +246,11 @@ export function ProtectedInput({ name, value, error, onChange, label, type = "te
     }, [hidden])
 
     return (
-        <div className="flex column left top form__label">
-            <label htmlFor="" className={`${labelClassName}`}>{label}</label>
+        <div className="flex column left top ">
+            <label htmlFor="" className={`form__label ${labelClassName}`}>{label}</label>
             <div className="position-rel w-100">
                 <input type={shown ? 'text' : 'password'} tabIndex={tabIndex}
-                    className={error ? "form__input form__input--error" : "form__input"}
+                    className={error ? "form__input form__input--error pl-42" : "form__input pl-42"}
                     name={name}
                     onChange={e => { e.persist(); onChange(e) }}
                     value={value}

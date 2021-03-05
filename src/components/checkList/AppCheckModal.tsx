@@ -33,14 +33,16 @@ export class AppCheckListModal extends Component<AppCheckListModalProps, AppChec
             return <div>
                 <img src={Checklist} className="applist__checklist-img" />
                 <h2 className="cn-9 fw-6 fs-16 mt-16 mb-4">Let’s get you started!</h2>
-                <p className="cn-9 mb-16">Complete the required configurations to perform desired task</p>
+                <p className="cn-9 mb-16 fs-13">Complete the required configurations to perform desired task</p>
                 <AppCheckList appChecklist={this.props.appChecklist}
+                    showDivider={true}
                     isAppCollapsed={this.state.isAppCollapsed}
                     appStageCompleted={this.props.appStageCompleted}
                     toggleAppChecklist={this.toggleAppChecklist} />
                 <hr className="checklist__divider mt-0 mb-0" />
                 <ChartCheckList chartChecklist={this.props.chartChecklist}
                     isChartCollapsed={this.state.isChartCollapsed}
+                    showDivider={false}
                     chartStageCompleted={this.props.chartStageCompleted}
                     toggleChartChecklist={this.toggleChartChecklist} />
             </div>
@@ -56,8 +58,9 @@ export class AppCheckListModal extends Component<AppCheckListModalProps, AppChec
             return <div>
                 <img src={Checklist} className="applist__checklist-img" />
                 <h2 className="cn-9 fw-6 fs-16 mt-16 mb-4">Let’s get you started!</h2>
-                <p className="cn-9 mb-16">Complete the required configurations to perform desired task</p>
+                <p className="cn-9 mb-16 fs-13">Complete the required configurations to perform desired task</p>
                 <AppCheckList appChecklist={this.props.appChecklist}
+                    showDivider={true}
                     isAppCollapsed={this.state.isAppCollapsed}
                     appStageCompleted={this.props.appStageCompleted}
                     toggleAppChecklist={this.toggleAppChecklist} />
