@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { URLS } from '../../config';
 import { NavLink } from 'react-router-dom';
 import ReactSelect, { components } from 'react-select';
+import { ReactComponent as Dropdown } from '../../assets/icons/appstatus/ic-dropdown.svg';
 import { ReactComponent as Add } from '../../assets/icons/ic-add.svg';
 import { ReactComponent as Check } from '../../assets/icons/ic-check.svg';
 import './CIConfig.scss';
@@ -59,10 +60,11 @@ export default function CIConfig({ respondOnSuccess, ...rest }) {
 }
 
 function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
+    const [isCollapsed, setIsCollapsed] = useState(false)
     const { state, disable, handleOnChange, handleOnSubmit } = useForm(
         {
             repository: { value: ciConfig && ciConfig.dockerBuildConfig.gitMaterialId ? sourceConfig.material.find(material => material.id === ciConfig.dockerBuildConfig.gitMaterialId).checkoutPath : Array.isArray(sourceConfig.material) && sourceConfig.material.length === 1 ? (sourceConfig.material[0].checkoutPath || "./") : "", error: "" },
-            dockerfile: { value: ciConfig ? ciConfig.dockerBuildConfig.dockerfileRelativePath : "", error: "" },
+            dockerfile: { value: ciConfig ? ciConfig.dockerBuildConfig.dockerfileRelativePath : "Dockerfile", error: "" },
             registry: { value: ciConfig ? ciConfig.dockerRegistry : (Array.isArray(dockerRegistries) ? dockerRegistries.find(reg => reg.isDefault).id || "" : ""), error: "" },
             repository_name: { value: ciConfig ? ciConfig.dockerRepository : "", error: "" },
         },
@@ -163,6 +165,11 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
             return Array.from(arr);
         })
     }
+
+    function toggleCollapse() {
+        setIsCollapsed(!isCollapsed)
+    }
+
     const { repository, dockerfile, registry, repository_name, key, value } = state
     return (
         <div className="form__app-compose">
@@ -170,21 +177,7 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
             <p className="form__subtitle">Required to execute CI pipelines for this application.
             <span><a rel="noreferrer noopener" target="_blank" className="learn-more__href" href={DOCUMENTATION.GLOBAL_CONFIG_DOCKER}> Learn more about Docker Build Config</a> </span></p>
             <div className="white-card white-card__docker-config">
-                <div className="form-row form-row__docker">
-                    <div className="form__field">
-                        <label className="form__label">Repository*</label>
-                        <Select onChange={handleOnChange} name='repository' value={repository.value} tabIndex={1}>
-                            <Select.Button>{repository.value || "Select repository"}</Select.Button>
-                            {sourceConfig.material.map(config => <Select.Option key={config.id} value={config.checkoutPath || "./"}>{config.checkoutPath || "./"}</Select.Option>)}
-                        </Select>
-                        {repository.error && <label className="form__error">{repository.error}</label>}
-                    </div>
-                    <div className="form__field">
-                        <label htmlFor="" className="form__label">Docker file path (relative)*</label>
-                        <input tabIndex={2} type="text" className="form__input" placeholder="Dockerfile" name="dockerfile" value={dockerfile.value} onChange={handleOnChange} />
-                        {dockerfile.error && <label className="form__error">{dockerfile.error}</label>}
-                    </div>
-                </div>
+                <div className="fs-16 fw-6 pb-16">Image store</div>
                 <div className="form-row form-row__docker">
                     <div className="form__field">
                         <label htmlFor="" className="form__label">Docker registry*</label>
@@ -204,14 +197,41 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
                         {!ciConfig && <label className="form__error form__error--info">New repository will be created if not provided</label>}
                     </div>
                 </div>
-                <div className="form-row form-row__add-parameters">
-                    <label htmlFor="" className="form__label bold">Docker build arguments</label>
-                    <div className="add-parameter bold pointer" onClick={e => setArgs(args => [{ k: "", v: '', keyError: '', valueError: '' }, ...args])}>
-                        <span className="fa fa-plus"></span>Add parameter
+                <div className="fs-16 fw-6 pb-16">Checkout Path</div>
+                <div className="form-row form-row__docker">
+                    <div className="form__field">
+                        <label className="form__label">Git checkout path*</label>
+                        <Select onChange={handleOnChange} name='repository' value={repository.value} tabIndex={1}>
+                            <Select.Button>{repository.value || "Select repository"}</Select.Button>
+                            {sourceConfig.material.map(config => <Select.Option key={config.id} value={config.checkoutPath || "./"}>{config.checkoutPath || "./"}</Select.Option>)}
+                        </Select>
+                        {repository.error && <label className="form__error">{repository.error}</label>}
+                    </div>
+                    <div className="form__field">
+                        <label htmlFor="" className="form__label">Docker file path (relative)*</label>
+                        <input tabIndex={2} type="text" className="form__input" placeholder="Dockerfile" name="dockerfile" value={dockerfile.value} onChange={handleOnChange} />
+                        {dockerfile.error && <label className="form__error">{dockerfile.error}</label>}
                     </div>
                 </div>
-                {args && args.map((arg, idx) => <KeyValueInput keyLabel={"Key"} valueLabel={"Value"}  {...arg} key={idx} index={idx} onChange={handleArgsChange} onDelete={e => { let argsTemp = [...args]; argsTemp.splice(idx, 1); setArgs(argsTemp) }} valueType="text" />)}
-                <div className="form__buttons">
+
+                <div onClick={toggleCollapse} className="flex left">
+                    <div>
+                        <div className="fs-16 fw-6 pb-4">Advanced</div>
+                        <div className="form-row form-row__add-parameters">
+                            <label htmlFor="" className=" fs-14 fw-4 cn-7">Docker build arguments</label>
+                        </div>
+                    </div>
+                    <span className="docker__dropdown ">
+                        <Dropdown className="icon-dim-32 rotate " style={{ ['--rotateBy' as any]: isCollapsed ? '180deg' : '0deg' }} />
+                    </span>
+                </div>
+                {isCollapsed ? <>
+                    {args && args.map((arg, idx) => <KeyValueInput keyLabel={"Key"} valueLabel={"Value"}  {...arg} key={idx} index={idx} onChange={handleArgsChange} onDelete={e => { let argsTemp = [...args]; argsTemp.splice(idx, 1); setArgs(argsTemp) }} valueType="text" />)}
+
+                    <div className="add-parameter pointer fs-14 cb-5 mb-20" onClick={e => setArgs(args => [{ k: "", v: '', keyError: '', valueError: '' }, ...args])}>
+                        <span className="fa fa-plus mr-8"></span>Add parameter
+                    </div> </> : ''}
+                <div className="form__buttons mt-12">
                     <button tabIndex={5} type="button" className={`cta`} onClick={handleOnSubmit}>{loading ? <Progressing /> : 'Save Configuration'}</button>
                 </div>
             </div>
