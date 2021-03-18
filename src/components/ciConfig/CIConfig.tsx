@@ -9,10 +9,8 @@ import { KeyValueInput } from '../configMaps/ConfigMap'
 import { toast } from 'react-toastify';
 import { URLS } from '../../config';
 import { NavLink } from 'react-router-dom';
-import ReactSelect, { components } from 'react-select';
 import { ReactComponent as Dropdown } from '../../assets/icons/appstatus/ic-dropdown.svg';
 import { ReactComponent as Add } from '../../assets/icons/ic-add.svg';
-import { ReactComponent as Check } from '../../assets/icons/ic-check.svg';
 import './CIConfig.scss';
 
 export default function CIConfig({ respondOnSuccess, ...rest }) {
@@ -91,7 +89,8 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
                 }
             },
             repository_name: {
-                required: false,
+                required: true,
+                
             }
 
         }, onValidation);
@@ -193,7 +192,18 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
                     </div>
                     <div className="form__field">
                         <label htmlFor="" className="form__label">Docker repository</label>
-                        <input tabIndex={4} type="text" className="form__input" placeholder="Enter repository name" name="repository_name" value={repository_name.value} onChange={handleOnChange} />
+                        <input
+                            tabIndex={4}
+                            type="text"
+                            className="form__input"
+                            placeholder="Enter repository name"
+                            name="repository_name"
+                            value={repository_name.value}
+                            onChange={handleOnChange}
+                            autoFocus
+                            autoComplete={"off"}
+                        />
+                        {repository_name.error && <label className="form__error">{repository_name.error}</label>}
                         {!ciConfig && <label className="form__error form__error--info">New repository will be created if not provided</label>}
                     </div>
                 </div>
@@ -209,11 +219,21 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
                     </div>
                     <div className="form__field">
                         <label htmlFor="" className="form__label">Docker file path (relative)*</label>
-                        <input tabIndex={2} type="text" className="form__input" placeholder="Dockerfile" name="dockerfile" value={dockerfile.value} onChange={handleOnChange} />
+                        <input
+                            tabIndex={2}
+                            type="text"
+                            className="form__input"
+                            placeholder="Dockerfile"
+                            name="dockerfile"
+                            value={dockerfile.value}
+                            onChange={handleOnChange}
+                            autoFocus
+                            autoComplete={"off"}
+                        />
                         {dockerfile.error && <label className="form__error">{dockerfile.error}</label>}
                     </div>
                 </div>
-                <hr className="mt-0 mb-20"/>
+                <hr className="mt-0 mb-20" />
                 <div onClick={toggleCollapse} className="flex left cursor">
                     <div>
                         <div className="fs-16 fw-6 ">Advanced</div>
@@ -228,6 +248,7 @@ function Form({ dockerRegistries, sourceConfig, ciConfig, reload, appId }) {
                 {isCollapsed ? <>
                     {args && args.map((arg, idx) => <KeyValueInput keyLabel={"Key"} valueLabel={"Value"}  {...arg} key={idx} index={idx} onChange={handleArgsChange} onDelete={e => { let argsTemp = [...args]; argsTemp.splice(idx, 1); setArgs(argsTemp) }} valueType="text" />)}
                     <div className="add-parameter pointer fs-14 cb-5 mb-20" onClick={e => setArgs(args => [{ k: "", v: '', keyError: '', valueError: '' }, ...args])}>
+
                         <span className="fa fa-plus mr-8"></span>Add parameter
                     </div> </> : ''}
                 <div className="form__buttons mt-12">

@@ -23,8 +23,8 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                 <span className="mr-8">
                     {this.props.material.url.includes("gitlab") ? <GitLab /> : null}
                     {this.props.material.url.includes("github") ? <GitHub /> : null}
-                    {this.props.material.url.includes("bitbuclet") ? <BitBucket /> : null}
-                    {this.props.material.url.includes("gitlab") || this.props.material.url.includes("github") || this.props.material.url.includes("bitbuclet") ? null : <Git />}
+                    {this.props.material.url.includes("bitbucket") ? <BitBucket /> : null}
+                    {this.props.material.url.includes("gitlab") || this.props.material.url.includes("github") || this.props.material.url.includes("bitbucket") ? null : <Git />}
                 </span>
                 <div className="">
                     <div className="git__provider">{(this.props.material).name}</div>
@@ -55,7 +55,6 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                         isMulti={false}
                         isClearable={false}
                         options={this.props.providers}
-                        // options={this.props.providers}
                         getOptionLabel={option => `${option.name}`}
                         getOptionValue={option => `${option.id}`}
                         value={this.props.material.gitProvider}
@@ -104,7 +103,7 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                             },
                             Control: (props) => {
                                 let value = "";
-                                
+
                                 if (props.hasValue) {
                                     value = props.getValue()[0].url;
                                 }
@@ -112,13 +111,13 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                                 return <components.Control {...props}>
 
                                     {value.includes("github") ? <GitHub className="icon-dim-20 ml-8" /> : null}
-                                    {value.includes("gitlab") ? <GitLab className="icon-dim-20 ml-8"/> : null}
-                                    {value.includes("bitbucket") ? <BitBucket className="icon-dim-20 ml-8"/> : null}
-                                    
-                                    {showGit ?  <Git className="icon-dim-20 ml-8"/> : null }
+                                    {value.includes("gitlab") ? <GitLab className="icon-dim-20 ml-8" /> : null}
+                                    {value.includes("bitbucket") ? <BitBucket className="icon-dim-20 ml-8" /> : null}
+
+                                    {showGit ? <Git className="icon-dim-20 ml-8" /> : null}
                                     {props.children}
                                 </components.Control>
-                            
+
                             },
                         }}
 
@@ -132,6 +131,8 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                 <div>
                     <label className="form__label">Git Repo URL*</label>
                     <input className="form__input"
+                        autoComplete={"off"}
+                        autoFocus
                         name="Git Repo URL*"
                         type="text"
                         placeholder="e.g. https://gitlab.com/abc/xyz.git"
@@ -153,13 +154,16 @@ export class MaterialView extends Component<MaterialViewProps, {}> {
                     tabIndex={3}
                     onChange={this.props.handleCheckbox}
                     rootClassName="form__label">
-                    <span className="">Set Checkout Path(*Required If you’re using multiple Git Materials)</span>
+                    <span className="">Set Checkout Path (*Required If you’re using multiple Git Materials)</span>
                 </Checkbox>
-                {this.props.isChecked ? <input className="form__input"
-                    type="text"
-                    placeholder="e.g. /abc"
-                    value={this.props.material.checkoutPath}
-                    onChange={this.props.handlePathChange} /> : ""}
+                {this.props.isChecked ?
+                    <input className="form__input"
+                        autoComplete={"off"}
+                        autoFocus
+                        type="text"
+                        placeholder="e.g. /abc"
+                        value={this.props.material.checkoutPath}
+                        onChange={this.props.handlePathChange} /> : ""}
                 <span className="form__error">
                     {this.props.isError.checkoutPath && <> <img src={error} className="form__icon" /> {this.props.isError.checkoutPath}</>}
                 </span>
