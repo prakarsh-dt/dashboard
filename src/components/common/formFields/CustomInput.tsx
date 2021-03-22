@@ -26,7 +26,7 @@ export class CustomInput extends Component<CustomInputProps, any> {
         if (this.props.labelClassName) labelClasses = `${labelClasses} ${this.props.labelClassName}`;
         return <div>
             <label className={labelClasses}>{this.props.label}</label>
-            <input type="text"
+            <input type={`text`}
                 autoFocus={this.props.autoFocus}
                 autoComplete={this.props.autoComplete}
                 tabIndex={this.props.tabIndex}
