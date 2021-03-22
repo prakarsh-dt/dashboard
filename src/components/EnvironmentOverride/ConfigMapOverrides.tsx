@@ -243,9 +243,15 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                 external: external,
                 mountPath: state.mountPath,
                 data: dataArray.reduce((agg, { k, v }) => ({ ...agg, [k]: v || "" }), {}),
-                subPath: state.subPath,
-                filePermission: state.filePermission.value,
             }
+
+            if (type === 'volume') {
+                payload['subPath'] = state.subPath;
+                if (isFilePermissionChecked) {
+                    payload['filePermission'] = state.filePermission.value.length <= 3 ? `0${state.filePermissionValue.value}` : `${state.filePermissionValue.value}`;
+                }
+            }
+
             dispatch({ type: 'submitLoading' });
             await overRideConfigMap(id, +appId, +envId, [payload])
             await reload();
@@ -342,7 +348,7 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                         autoComplete="off"
                         label={""}
                         disabled={!state.duplicate}
-                        placeholder={"eg. 0400"}
+                        placeholder={"eg. 0400 or 400"}
                         error={state.filePermission.error}
                         onChange={(e) => dispatch({ type: 'filePermission', value: { value: e.target.value, error: "" } })} />
                 </div> : null}
