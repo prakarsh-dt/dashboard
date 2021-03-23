@@ -214,7 +214,6 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
             }
             return
         }
-
         if (type === 'volume' && isFilePermissionChecked) {
             if (!state.filePermission.value) {
                 dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'This is a required field' } })
@@ -230,7 +229,7 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                     return;
                 }
             }
-            if (state.filePermission.value.length === 3) {
+            else if (state.filePermission.value.length === 3) {
                 if (state.filePermission.value.startsWith('0')) {
                     dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'This is octal format, please enter 4 characters' } });
                     return;
@@ -238,6 +237,10 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
             }
             else if (state.filePermission.value.length < 3) {
                 dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'Atleast 3 character are required' } });
+                return;
+            }
+            if (!new RegExp(PATTERNS.FILE_PERMISSION).test(state.filePermission.value)) {
+                dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'This is octal number, use numbers between 0 to 7' } });
                 return;
             }
         }
@@ -257,7 +260,7 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                 payload['mountPath'] = state.mountPath;
                 payload['subPath'] = state.subPath;
                 if (isFilePermissionChecked) {
-                    payload['filePermission'] = state.filePermission.value.length <= 3 ? `0${state.filePermissionValue.value}` : `${state.filePermissionValue.value}`;
+                    payload['filePermission'] = state.filePermission.value.length <= 3 ? `0${state.filePermission.value}` : `${state.filePermission.value}`;
                 }
             }
 
@@ -274,6 +277,7 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
             dispatch({ type: 'success' });
         }
         catch (err) {
+            console.log(err)
             showError(err)
             dispatch({ type: 'error' })
         }
@@ -359,7 +363,7 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                         disabled={!state.duplicate}
                         placeholder={"eg. 0400 or 400"}
                         error={state.filePermission.error}
-                        onChange={(e) => dispatch({ type: 'filePermission', value: { value: e.target.value, error: "" } })} />
+                        onChange={(e) => { dispatch({ type: 'filePermission', value: { value: e.target.value, error: "" } }) }} />
                 </div> : null}
                 {!external && <div className="flex left mb-16">
                     <b className="mr-5 bold">Data*</b>
