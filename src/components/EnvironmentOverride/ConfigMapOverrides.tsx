@@ -67,7 +67,7 @@ export function ListComponent({ name = "", type, label = "", reload = null }) {
         <div className="white-card white-card--list">
             <div className="environment-override-list pointer left flex" onClick={e => toggleCollapse(!isCollapsed)}>
                 <img src={name ? (type === 'config-map' ? fileIcon : keyIcon) : addIcon} alt="list-icon icon" />
-                <div className={`flex left ${!name ? 'bold anchor' : ''}`}>{name || `Add ${type === 'secret' ? 'Secret' : 'ConfigMap'}`}</div>
+                <div className={`flex left ${!name ? 'fw-5 fs-14 cb-5' : 'fw-5 fs-14 cn-9'}`}>{name || `Add ${type === 'secret' ? 'Secret' : 'ConfigMap'}`}</div>
                 {label && <div className="flex tag">{label}</div>}
                 <img className={`pointer rotate`} style={{ ['--rotateBy' as any]: `${Number(!isCollapsed) * 180}deg` }} src={arrowTriangle} alt="arrow" />
             </div>
@@ -244,11 +244,11 @@ const OverrideConfigMapForm: React.FC<ConfigMapProps> = memo(function OverrideCo
                 name: name,
                 type: type,
                 external: external,
-                mountPath: state.mountPath,
                 data: dataArray.reduce((agg, { k, v }) => ({ ...agg, [k]: v || "" }), {}),
             }
-
+            
             if (type === 'volume') {
+                payload['mountPath']= state.mountPath;
                 payload['subPath'] = state.subPath;
                 if (isFilePermissionChecked) {
                     payload['filePermission'] = state.filePermission.value.length <= 3 ? `0${state.filePermissionValue.value}` : `${state.filePermissionValue.value}`;

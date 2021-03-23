@@ -102,7 +102,7 @@ const Secret = ({ respondOnSuccess, ...props }) => {
     return (
         <div className="form__app-compose">
             <h1 className="form__title form__title--artifacts">Secrets</h1>
-            <p className="form__subtitle form__subtitle--artifacts">A Secret is an object that contains small amount of sensitive data such as passwords, OAuth tokens, and SSH keys.
+            <p className="form__subtitle form__subtitle--artifacts">A Secret is an object that contains sensitive data such as passwords, OAuth tokens, and SSH keys.
             <a className="learn-more__href" rel="noreferer noopener" href={DOCUMENTATION.APP_CREATE_SECRET} target="blank"> Learn more about Secrets</a></p>
             {list && <CollapsedSecretForm appId={appId} id={list.id || 0} title="Add Secret" update={update} initialise={initialise} />}
             {list && Array.isArray(list.configData) && list.configData.filter(cs => cs).map((cs, idx) => <CollapsedSecretForm key={cs.name} {...cs} appId={appId} id={list.id} update={update} index={idx} initialise={initialise} />)}
@@ -114,7 +114,7 @@ const Secret = ({ respondOnSuccess, ...props }) => {
 export function CollapsedSecretForm({ title = "", roleARN = "", secretData = [], mountPath = "", name = "", type = "environment", external = false, data = null, id = null, appId, update = null, index = null, initialise = null, externalType = "", filePermission = "", subPath = false, ...rest }) {
     const [collapsed, toggleCollapse] = useState(true)
     return <section className="mb-12 br-8 bcn-0 bw-1 en-2 pl-20 pr-20 pt-19 pb-19">{collapsed
-        ? <ListComponent title={name || title} onClick={e => toggleCollapse(!collapsed)} icon={title ? addIcon : keyIcon} collapsible={!title} className={title ? 'create-new' : ''} />
+        ? <ListComponent title={name || title} onClick={e => toggleCollapse(!collapsed)} icon={title ? addIcon : keyIcon} collapsible={!title} className={title ? 'fw-5 cb-5 fs-14' : 'fw-5 cn-9 fs-14'} />
         : <SecretForm name={name}
             secretData={secretData}
             mountPath={mountPath}
@@ -149,9 +149,9 @@ export function Tab({ title, active, onClick }) {
 export function ListComponent({ icon = "", title, subtitle = "", onClick, className = "", collapsible = false }) {
     return (
         <article className={`configuration-list pointer ${className}`} onClick={typeof onClick === 'function' ? onClick : function () { }}>
-            <img src={icon} className="configuration-list__logo" />
+            <img src={icon} className="configuration-list__logo icon-dim-24 fcb-5" />
             <div className="configuration-list__info">
-                <div className="configuration-list__title">{title}</div>
+                <div className="">{title}</div>
                 {subtitle && <div className="configuration-list__subtitle">{subtitle}</div>}
             </div>
             {collapsible && <img className="configuration-list__arrow pointer" src={arrowTriangle} />}
@@ -371,8 +371,6 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 external: !!externalType,
                 roleARN: isHashiOrAWS ? roleARN.value : "",
                 externalType,
-                ...(volumeMountPath.value && { mountPath: volumeMountPath.value }),
-
             }
             //Adding conditional fields
             if (isHashiOrAWS) {
@@ -391,6 +389,7 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
             }
 
             if (selectedTab === 'Data Volume') {
+                payload['mountPath'] = volumeMountPath.value;
                 payload['subPath'] = isSubPathChecked;
                 if (isFilePermissionChecked) {
                     payload['filePermission'] = filePermissionValue.value.length <= 3 ? `0${filePermissionValue.value}` : `${filePermissionValue.value}`;
