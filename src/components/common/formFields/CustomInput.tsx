@@ -5,6 +5,7 @@ import './customInput.css';
 
 export interface CustomInputProps {
     label: string;
+    type?: 'text' | 'number';
     value: string | number;
     labelClassName?: string;
     autoFocus?: boolean;
@@ -16,23 +17,19 @@ export interface CustomInputProps {
     tabIndex?: number;
     autoComplete: string;
     onChange: (...args) => void;
-    maxLength?;
-    pattern?;
-    required?: boolean;
-    type?: string;
 }
 
 export class CustomInput extends Component<CustomInputProps, any> {
 
     render() {
         let isError: boolean = !!this.props.error;
+        let type = this.props.type || 'text';
         let labelClasses = `form__label`;
         if (this.props.labelClassName) labelClasses = `${labelClasses} ${this.props.labelClassName}`;
         return <div>
             <label className={labelClasses}>{this.props.label}</label>
-            <input type={`text`}
+            <input type={type}
                 autoFocus={this.props.autoFocus}
-                maxLength={this.props.maxLength}
                 autoComplete={this.props.autoComplete}
                 tabIndex={this.props.tabIndex}
                 name={this.props.name}
@@ -40,9 +37,7 @@ export class CustomInput extends Component<CustomInputProps, any> {
                 className={isError ? "form__input" : "form__input"}
                 onChange={e => { e.persist(); this.props.onChange(e) }}
                 value={this.props.value}
-                disabled={this.props.disabled}
-                pattern= {this.props.pattern} 
-                required= {this.props.required}/>
+                disabled={this.props.disabled} />
             {this.props.error && <div className="form__error">
                 <Error className="form__icon form__icon--error" />
                 {this.props.error}
