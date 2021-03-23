@@ -70,7 +70,24 @@
         top: 50%;
         transform: translateY(-50%);
     }
-    
+
+    .form__error {
+        position: unset;
+        display: flex;
+        align-items: center;
+        margin-top: 4px;
+
+        // &:before {
+        //     content: '';
+        //     background: url('../../assets/icons/misc/errorInfo.svg');
+        //     height: 14px;
+        //     width: 14px;
+        //     display: inline-block;
+        //     background-size: contain;
+        //     margin-right: 4px;
+        // }
+    }
+
     textarea {
         border-radius: 4px;
         border: solid 1px #d6dbdf;

@@ -31,9 +31,9 @@
     }
     
     .ci-artifact__icon {
-        width: 24px;
-        height: 24px;
-        margin: 0 8px;
+        width: 20px;
+        height: 20px;
+        margin: 0 8px 0 0;
     }
     
     .ci-artifact {
@@ -133,9 +133,9 @@
     }
     
     .ci-stage__title {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 600;
-        line-height: 1.43;
+        line-height: 1.25;
         letter-spacing: normal;
         color: var(--N900);
         margin-bottom: 4px;
@@ -156,7 +156,6 @@
     
     .info__container.info__container--linked-ci {
         margin-bottom: 16px;
-        margin-top: 42px;
     }
     
     .script-container {
@@ -172,4 +171,9 @@
     .script-container .shebang {
         padding: 0 60px;
         color: #e00000;
+    }
+
+    .m-auto-mr--20{
+        margin: auto;
+        margin-right: -20px;
     }

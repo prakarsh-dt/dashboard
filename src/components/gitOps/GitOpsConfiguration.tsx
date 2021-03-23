@@ -247,6 +247,9 @@ export default class GitOpsConfiguration extends Component<GitOpsProps, GitOpsSt
                         error={this.state.isError[key]}
                         label={this.state.tab === GitProvider.Github ? "GitHub Organisation Name*" : "GitLab Group ID*"}
                         onChange={(event) => { this.handleChange(event, key); }} />
+                    {this.state.isError[key] && <div className="form__error">
+                        {this.state.isError[key]}
+                    </div>}
                 </div>
                 <hr />
                 <div className="fw-6 cn-9 fs-14 mb-16">Git access credentials</div>
