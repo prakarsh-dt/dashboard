@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { KeyValueInput, useKeyValueYaml, validateKeyValuePair } from '../configMaps/ConfigMap'
 import { getSecretList } from '../../services/service';
 import CodeEditor from '../CodeEditor/CodeEditor'
-import { CONFIGMAP_SECRET_LABEL, DOCUMENTATION, PATTERNS } from '../../config';
+import { DOCUMENTATION, PATTERNS } from '../../config';
 import YAML from 'yaml'
 import keyIcon from '../../assets/icons/ic-key.svg'
 import addIcon from '../../assets/icons/ic-add.svg'
@@ -190,8 +190,8 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
     const [externalType, setExternalType] = useState(props.externalType)
     const { envId } = useParams<{ envId }>()
     const [yamlMode, toggleYamlMode] = useState(true)
-    const { yaml, handleYamlChange, error } = useKeyValueYaml(externalValues, setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `key must be of format ${PATTERNS.CONFIG_MAP_AND_SECRET_KEY}`)
-    const { yaml: lockedYaml } = useKeyValueYaml(externalValues.map(({ k, v }) => ({ k, v: Array(8).fill("*").join("") })), setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `key must be of format ${PATTERNS.CONFIG_MAP_AND_SECRET_KEY}`)
+    const { yaml, handleYamlChange, error } = useKeyValueYaml(externalValues, setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
+    const { yaml: lockedYaml } = useKeyValueYaml(externalValues.map(({ k, v }) => ({ k, v: Array(8).fill("*").join("") })), setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
     const tempArray = useRef([])
     const [isSubPathChecked, setIsSubPathChecked] = useState(!!props.subPath)
     const [isFilePermissionChecked, setIsFilePermissionChecked] = useState(!!props.filePermission)
@@ -278,12 +278,12 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
     async function handleDelete() {
         try {
             if (!envId) {
-                const { result } = await deleteSecret(props.id, props.appId, props.name)
+                await deleteSecret(props.id, props.appId, props.name)
                 toast.success('Successfully deleted')
                 props.update(props.index, null)
             }
             else {
-                const { result } = await deleteEnvironmentSecret(props.id, props.appId, +envId, props.name)
+                await deleteEnvironmentSecret(props.id, props.appId, +envId, props.name)
                 toast.success('Successfully deleted')
                 props.update(props.index, null)
             }
@@ -333,17 +333,11 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                     return;
                 }
             }
-            else if (filePermissionValue.value.length === 3) {
-                if (filePermissionValue.value.startsWith('0')) {
-                    setFilePermissionValue({ value: filePermissionValue.value, error: 'This is octal format, please enter 4 characters' });
-                    return;
-                }
-            }
             else if (filePermissionValue.value.length < 3) {
                 setFilePermissionValue({ value: filePermissionValue.value, error: 'Atleast 3 character are required' });
                 return;
             }
-            if (!new RegExp(PATTERNS.FILE_PERMISSION).test(filePermissionValue.value)) {
+            if (!new RegExp(PATTERNS.ALL_DIGITS_BETWEEN_0_AND_7).test(filePermissionValue.value)) {
                 setFilePermissionValue({ value: filePermissionValue.value, error: 'This is octal number, use numbers between 0 to 7' });
                 return;
             }
@@ -402,9 +396,11 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
 
             if (selectedTab === 'Data Volume') {
                 payload['mountPath'] = volumeMountPath.value;
-                payload['subPath'] = isSubPathChecked;
+                if (isExternalValues) {
+                    payload['subPath'] = isSubPathChecked;
+                }
                 if (isFilePermissionChecked) {
-                    payload['filePermission'] = filePermissionValue.value.length <= 3 ? `0${filePermissionValue.value}` : `${filePermissionValue.value}`;
+                    payload['filePermission'] = filePermissionValue.value.length == 3 ? `0${filePermissionValue.value}` : `${filePermissionValue.value}`;
                 }
             }
 
@@ -555,23 +551,35 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 error={volumeMountPath.error}
                 onChange={e => setVolumeMountPath({ value: e.target.value, error: "" })} />
         </div> : null}
-        {selectedTab === 'Data Volume' ?
+        {isExternalValues && selectedTab === 'Data Volume' ?
             <div className="mb-16">
                 <Checkbox isChecked={isSubPathChecked}
                     onClick={(e) => { e.stopPropagation() }}
-                    rootClassName="form__checkbox-label--ignore-cache"
+                    rootClassName=""
                     value={CHECKBOX_VALUE.CHECKED}
                     onChange={(e) => setIsSubPathChecked(!isSubPathChecked)}>
-                    <span className="mr-5"> {CONFIGMAP_SECRET_LABEL.SUBPATH}</span>
+                    <span className="mr-5">
+                        Set SubPath (same as
+                        <a href="https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                            subPath
+                        </a>
+                        for volume mount)<br></br>
+                        {isSubPathChecked ? <span className="mb-0 cn-5 fs-11">Keys will be used as filename for subpath</span> : null}
+                    </span>
                 </Checkbox>
             </div> : ""}
         {selectedTab === 'Data Volume' ? <div className="mb-16">
             <Checkbox isChecked={isFilePermissionChecked}
                 onClick={(e) => { e.stopPropagation() }}
-                rootClassName="form__checkbox-label--ignore-cache"
+                rootClassName=""
                 value={CHECKBOX_VALUE.CHECKED}
                 onChange={(e) => setIsFilePermissionChecked(!isFilePermissionChecked)}>
-                <span className="mr-5"> Set File Permission (Corresponds to defaultMode specified in kubernetes)</span>
+                 <span className="mr-5"> Set File Permission (same as
+                    <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-files-permissions" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                        defaultMode
+                    </a>
+                    for secrets in kubernetes)
+                </span>
             </Checkbox>
         </div> : ""}
         {selectedTab === 'Data Volume' && isFilePermissionChecked ? <div className="mb-16">
@@ -679,7 +687,6 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
             <img src={addIcon} alt="add" />
                 Add parameter
             </div>}
-
         <div className="form__buttons">
             <button type="button" className="cta" onClick={handleSubmit}>{loading ? <Progressing /> : `${props.name ? 'Update' : 'Save'} Secret`}</button>
         </div>

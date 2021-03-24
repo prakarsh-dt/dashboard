@@ -11,7 +11,7 @@ import { Progressing } from '../common'
 import warningIcon from '../../assets/icons/ic-warning.svg'
 import CodeEditor from '../CodeEditor/CodeEditor'
 import YAML from 'yaml'
-import { CONFIGMAP_SECRET_LABEL, PATTERNS } from '../../config';
+import { PATTERNS } from '../../config';
 import { KeyValueFileInput } from '../util/KeyValueFileInput';
 import './environmentOverride.scss'
 
@@ -125,7 +125,7 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
                     ...state, duplicate: state.duplicate.reduce((agg, dup) => {
                         return [...agg, {
                             ...dup,
-                            keyError: typeof dup.v === 'string' && !(new RegExp(PATTERNS.CONFIG_MAP_AND_SECRET_KEY)).test(dup.k) ? "Key must be of format /^[-_.a-zA-Z0-9]+$" : "",
+                            keyError: typeof dup.v === 'string' && !(new RegExp(PATTERNS.CONFIG_MAP_AND_SECRET_KEY)).test(dup.k) ? "Key must consist of alphanumeric characters, '.', '-' and '_'" : "",
                             valueError: dup.v !== 'string' && dup.k ? "Both key value pairs are required" : ""
                         }]
                     }, [])
@@ -173,7 +173,7 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
     }
     const [state, dispatch] = useReducer(memoisedReducer, initialState)
     const tempArr = useRef([])
-    const { yaml, handleYamlChange, error } = useKeyValueYaml(state.duplicate || [], setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `key must be of format ${PATTERNS.CONFIG_MAP_AND_SECRET_KEY}`)
+    const { yaml, handleYamlChange, error } = useKeyValueYaml(state.duplicate || [], setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
     const [yamlMode, toggleYamlMode] = useState(true)
     const [isFilePermissionChecked, setIsFilePermissionChecked] = useState(!!filePermission)
 
@@ -263,17 +263,11 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
                     return;
                 }
             }
-            else if (state.filePermission.value.length === 3) {
-                if (state.filePermission.value.startsWith('0')) {
-                    dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'This is octal format, please enter 4 characters' } });
-                    return;
-                }
-            }
             else if (state.filePermission.value.length < 3) {
                 dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'Atleast 3 character are required' } });
                 return;
             }
-            if (!new RegExp(PATTERNS.FILE_PERMISSION).test(state.filePermission.value)) {
+            if (!new RegExp(PATTERNS.ALL_DIGITS_BETWEEN_0_AND_7).test(state.filePermission.value)) {
                 dispatch({ type: 'filePermission', value: { value: state.filePermission.value, error: 'This is octal number, use numbers between 0 to 7' } });
                 return;
             }
@@ -321,13 +315,15 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
             }
             if (type === 'volume') {
                 payload['mountPath'] = state.mountPath;
-                payload['subPath'] = state.subPath;
+                if (externalType !== "KubernetesSecret") {
+                    payload['subPath'] = state.subPath;
+                }
                 if (isFilePermissionChecked) {
-                    payload['filePermission'] = state.filePermission.value.length <= 3 ? `0${state.filePermission.value}` : `${state.filePermission.value}`;
+                    payload['filePermission'] = state.filePermission.value.length == 3 ? `0${state.filePermission.value}` : `${state.filePermission.value}`;
                 }
             }
             dispatch({ type: 'loadingSubmit' });
-            const { result } = await overRideSecret(id, +appId, +envId, [payload])
+            await overRideSecret(id, +appId, +envId, [payload])
             await reload()
             toast.success(
                 <div className="toast">
@@ -469,13 +465,19 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
                             onChange={e => dispatch({ type: 'mountPath', value: e.target.value })} />
                     </div>
                 </div>}
-            {type === "volume" && <Checkbox isChecked={state.subPath}
+            {externalType !== "KubernetesSecret" && type === "volume" && <Checkbox isChecked={state.subPath}
                 onClick={(e) => { e.stopPropagation(); }}
                 disabled={!state.duplicate}
                 rootClassName="form__checkbox-label--ignore-cache"
                 value={CHECKBOX_VALUE.CHECKED}
                 onChange={(e) => { dispatch({ type: 'subPath', value: !state.subPath }) }}>
-                <span className="mr-5"> {CONFIGMAP_SECRET_LABEL.SUBPATH}</span>
+                <span className="mr-5">
+                    Set SubPath (same as
+                    <a href="https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                        subPath
+                    </a>for volume mount)<br></br>
+                    {state.subPath ? <span className="mb-0 cn-5 fs-11">Keys will be used as filename for subpath</span> : null}
+                </span>
             </Checkbox>}
             {type === "volume" && <div className="mb-16">
                 <Checkbox isChecked={isFilePermissionChecked}
@@ -484,7 +486,11 @@ export function OverrideSecretForm({ name, toggleCollapse }) {
                     rootClassName="form__checkbox-label--ignore-cache"
                     value={CHECKBOX_VALUE.CHECKED}
                     onChange={(e) => { setIsFilePermissionChecked(!isFilePermissionChecked) }}>
-                    <span className="mr-5"> Set File Permission (Corresponds to defaultMode specified in kubernetes)</span>
+                    <span className="mr-5"> Set File Permission (same as
+                        <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-files-permissions" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                            defaultMode
+                        </a>
+                     for secrets in kubernetes)</span>
                 </Checkbox>
             </div>}
             {type === "volume" && isFilePermissionChecked ? <div className="mb-16">

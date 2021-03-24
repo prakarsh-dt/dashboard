@@ -7,7 +7,7 @@ import { overRideConfigMap, deleteConfigMap as deleteEnvironmentConfig } from '.
 import { toast } from 'react-toastify';
 import CodeEditor from '../CodeEditor/CodeEditor'
 import YAML from 'yaml'
-import { CONFIGMAP_SECRET_LABEL, DOCUMENTATION, PATTERNS } from '../../config';
+import { DOCUMENTATION, PATTERNS } from '../../config';
 import Reload from '../Reload/Reload'
 import arrowTriangle from '../../assets/icons/appstatus/ic-dropdown.svg'
 import { ReactComponent as File } from '../../assets/icons/ic-file.svg'
@@ -189,7 +189,7 @@ export function validateKeyValuePair(arr: KeyValue[]): KeyValueValidated {
             isValid = false
         }
         if (typeof v === 'string' && !PATTERNS.CONFIG_MAP_AND_SECRET_KEY.test(k)) {
-            keyError = `Key '${k}' must be of ${PATTERNS.CONFIG_MAP_AND_SECRET_KEY} format`
+            keyError = `Key '${k}' must consist of alphanumeric characters, '.', '-' and '_'`
             isValid = false
         }
         return [...agg, { k, v, keyError, valueError }]
@@ -206,7 +206,7 @@ export function ConfigMapForm({ id, appId, name = "", external, data = null, typ
     const [loading, setLoading] = useState(false)
     const { envId } = useParams<{ envId }>()
     const [yamlMode, toggleYamlMode] = useState(true)
-    const { yaml, handleYamlChange, error } = useKeyValueYaml(externalValues, setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `key must be of format ${PATTERNS.CONFIG_MAP_AND_SECRET_KEY}`)
+    const { yaml, handleYamlChange, error } = useKeyValueYaml(externalValues, setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
     const tempArray = useRef([])
     const [isSubPathChecked, setIsSubPathChecked] = useState(!!subPath)
     const [isFilePermissionChecked, setIsFilePermissionChecked] = useState(!!filePermission)
@@ -288,17 +288,11 @@ export function ConfigMapForm({ id, appId, name = "", external, data = null, typ
                     return;
                 }
             }
-            else if (filePermissionValue.value.length === 3) {
-                if (filePermissionValue.value.startsWith('0')) {
-                    setFilePermissionValue({ value: filePermissionValue.value, error: 'This is octal format, please enter 4 characters' });
-                    return;
-                }
-            }
             else if (filePermissionValue.value.length < 3) {
                 setFilePermissionValue({ value: filePermissionValue.value, error: 'Atleast 3 character are required' });
                 return;
             }
-            if (!new RegExp(PATTERNS.FILE_PERMISSION).test(filePermissionValue.value)) {
+            if (!new RegExp(PATTERNS.ALL_DIGITS_BETWEEN_0_AND_7).test(filePermissionValue.value)) {
                 setFilePermissionValue({ value: filePermissionValue.value, error: 'This is octal number, use numbers between 0 to 7' });
                 return;
             }
@@ -329,9 +323,11 @@ export function ConfigMapForm({ id, appId, name = "", external, data = null, typ
             }
             if (selectedTab === 'Data Volume') {
                 payload['mountPath'] = volumeMountPath.value;
-                payload['subPath'] = isSubPathChecked;
+                if (!isExternalValues) {
+                    payload['subPath'] = isSubPathChecked;
+                }
                 if (isFilePermissionChecked) {
-                    payload['filePermission'] = filePermissionValue.value.length <= 3 ? `0${filePermissionValue.value}` : `${filePermissionValue.value}`;
+                    payload['filePermission'] = filePermissionValue.value.length === 3 ? `0${filePermissionValue.value}` : `${filePermissionValue.value}`;
                 }
             }
             if (!envId) {
@@ -428,23 +424,33 @@ export function ConfigMapForm({ id, appId, name = "", external, data = null, typ
                     error={volumeMountPath.error}
                     onChange={e => setVolumeMountPath({ value: e.target.value, error: "" })} />
             </div> : null}
-            {selectedTab === 'Data Volume' ?
+            {!isExternalValues && selectedTab === 'Data Volume' ?
                 <div className="mb-16">
                     <Checkbox isChecked={isSubPathChecked}
                         onClick={(e) => { e.stopPropagation(); }}
-                        rootClassName="form__checkbox-label--ignore-cache"
+                        rootClassName="top"
                         value={CHECKBOX_VALUE.CHECKED}
                         onChange={(e) => setIsSubPathChecked(!isSubPathChecked)}>
-                        <span className="mr-5"> {CONFIGMAP_SECRET_LABEL.SUBPATH}</span>
+                        <span className="mb-0">Set SubPath (same as
+                            <a href="https://kubernetes.io/docs/concepts/storage/volumes/#using-subpath" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                                subPath
+                            </a>
+                            for volume mount)<br></br>
+                            {isSubPathChecked ? <span className="mb-0 cn-5 fs-11">Keys will be used as filename for subpath</span> : null}
+                        </span>
                     </Checkbox>
                 </div> : ""}
             {selectedTab === 'Data Volume' ? <div className="mb-16">
                 <Checkbox isChecked={isFilePermissionChecked}
                     onClick={(e) => { e.stopPropagation() }}
-                    rootClassName="form__checkbox-label--ignore-cache"
+                    rootClassName=""
                     value={CHECKBOX_VALUE.CHECKED}
                     onChange={(e) => setIsFilePermissionChecked(!isFilePermissionChecked)}>
-                    <span className="mr-5"> Set File Permission (Corresponds to defaultMode specified in kubernetes)</span>
+                    <span className="mr-5"> Set File Permission (same as
+                        <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-files-permissions" className="ml-5 mr-5 anchor" target="_blank" rel="noopener noreferer">
+                            defaultMode
+                        </a>
+                     for secrets in kubernetes)</span>
                 </Checkbox>
             </div> : ""}
             {selectedTab === 'Data Volume' && isFilePermissionChecked ? <div className="mb-16">
