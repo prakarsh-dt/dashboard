@@ -321,7 +321,7 @@ export default class CIPipeline extends Component<CIPipelineProps, CIPipelineSta
             return;
         }
         let msg = this.state.ciPipeline.id ? 'Pipeline Updated' : 'Pipeline Created';
-        saveCIPipeline(this.state.form, this.state.ciPipeline, this.state.gitMaterials, +this.props.match.params.appId, 0, false).then((response) => {
+        saveCIPipeline(this.state.form, this.state.ciPipeline, this.state.gitMaterials, +this.props.match.params.appId, +this.props.match.params.workflowId, false).then((response) => {
             if (response) {
                 toast.success(msg);
                 this.setState({ loadingData: false });
@@ -415,14 +415,13 @@ export default class CIPipeline extends Component<CIPipelineProps, CIPipelineSta
     }
 
     renderAdvanceCI() {
-        return <CIPipelineAdvanced {...this.props}
-            {...this.state}
+        return <CIPipelineAdvanced {...this.state}
             validationRules={this.validationRules}
             closeCIDeleteModal={this.closeCIDeleteModal}
             deletePipeline={this.deletePipeline}
             handlePreBuild={this.handlePreBuild}
             handlePostBuild={this.handlePostBuild}
-            handleDockerArgs= {this.handleDockerArgs}
+            handleDockerArgs={this.handleDockerArgs}
             addEmptyStage={this.addEmptyStage}
             toggleCollapse={this.toggleCollapse}
             deleteStage={this.deleteStage}
@@ -469,7 +468,7 @@ export default class CIPipeline extends Component<CIPipelineProps, CIPipelineSta
                 {this.state.view !== ViewType.LOADING && <>
                     <div className="ci-button-container bcn-0 pt-12 pb-12 pl-20 pr-20 flex flex-justify">
                         {this.renderSecondaryButtton()}
-                        <ButtonWithLoader rootClassName="cta cta--workflow"
+                        <ButtonWithLoader rootClassName="cta cta--workflow flex-1"
                             loaderColor="white"
                             onClick={this.savePipeline}
                             isLoading={this.state.loadingData}>

@@ -27,6 +27,10 @@
         @include flex(align-items, justify-content);
         flex-direction: column;
     }
+
+    &.wrap{
+        flex-wrap: wrap;
+    }
 }
 
 .flexbox {
@@ -292,14 +296,8 @@ $color-suffix: 00;
     line-height: 1.54
 }
 
-.m-auto-mr-0 {
-    margin: auto;
-    margin-right: 0px;
-}
-
-.m-auto-mr-20 {
-    margin: auto;
-    margin-right: 20px;
+.ml-auto {
+    margin-left: auto;
 }
 
 .dashed {
@@ -316,4 +314,22 @@ $color-suffix: 00;
 
 .modal__top-fixed {
     height: 50px;
+}
+
+.line{
+    width: 1px;
+    height: 25px;
+    border-right: 1px solid #959ba1;
+    margin-left: 10px;
+}
+
+.no-line{
+    width: 1px;
+    height: 24px;
+    border-right: 1px solid #ffffff;
+    margin-left: 10px;
+}
+
+.o-5{
+    opacity: 0.5;
 }

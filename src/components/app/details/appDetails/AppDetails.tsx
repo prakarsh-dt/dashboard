@@ -49,6 +49,12 @@ import { ReactComponent as AlertTriangle } from '../../../../assets/icons/ic-ale
 import { ReactComponent as DropDownIcon } from '../../../../assets/icons/appstatus/ic-dropdown.svg';
 import { ReactComponent as ScaleDown } from '../../../../assets/icons/ic-scale-down.svg';
 import { ReactComponent as CommitIcon } from '../../../../assets/icons/ic-code-commit.svg';
+import { ReactComponent as Loader } from '../../../../assets/icons/appstatus/progressing.svg';
+import { ReactComponent as Waiting } from '../../../../assets/icons/ic-clock.svg';
+import { ReactComponent as Failed } from '../../../../assets/icons/appstatus/ic-appstatus-failed.svg';
+import { ReactComponent as Success } from '../../../../assets/icons/ic-outline-check.svg';
+import { ReactComponent as Close } from '../../../../assets/icons/ic-close.svg';
+import Uncheck from '../../../../assets/img/ic-success@2x.png';
 import Tippy from '@tippyjs/react';
 import ReactGA from 'react-ga';
 import Select, { components } from 'react-select';
@@ -65,6 +71,8 @@ import {
 } from '../../types';
 import { aggregateNodes, SecurityVulnerabilitites } from './utils';
 import { AppMetrics } from './AppMetrics';
+
+
 export type SocketConnectionType = 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED' | 'DISCONNECTING';
 
 export default function AppDetail() {
@@ -145,6 +153,7 @@ export const Details: React.FC<{
     const { url, path } = useRouteMatch();
     const [detailedNode, setDetailedNode] = useState<{ name: string; containerName?: string }>(null);
     const [detailedStatus, toggleDetailedStatus] = useState<boolean>(false);
+    const [deploymentStatus, toggleDeploymentStatus] = useState(false);
     const [commitInfo, showCommitInfo] = useState<boolean>(false)
     const [hibernateConfirmationModal, setHibernateConfirmationModal] = useState<'' | 'resume' | 'hibernate'>('');
     const [hibernating, setHibernating] = useState<boolean>(false)
@@ -173,6 +182,7 @@ export const Details: React.FC<{
         (event) => setStreamData(JSON.parse(event.data)),
     );
 
+
     const aggregatedNodes: AggregatedNodes = useMemo(() => {
         return aggregateNodes(appDetails?.resourceTree?.nodes || [], appDetails?.resourceTree?.podMetadata || []);
     }, [appDetails]);
@@ -188,6 +198,7 @@ export const Details: React.FC<{
             }
         }
     }
+
 
     function describeNode(name: string, containerName: string) {
         setDetailedNode({ name, containerName });
@@ -307,13 +318,14 @@ export const Details: React.FC<{
                 />}
                 <AppSyncDetails streamData={streamData} />
             </div> */}
-            <div className="w-100 pt-16 pr-24 pb-20 pl-24">
+            <div className="w-100 pt-16 pb-20">
                 <SourceInfo
                     appDetails={appDetails}
                     setDetailed={toggleDetailedStatus}
                     environments={environments}
                     showCommitInfo={isAppDeployment ? showCommitInfo : null}
                     showHibernateModal={isAppDeployment ? setHibernateConfirmationModal : null}
+                    showDeploymentModal={toggleDeploymentStatus}
                 />
             </div>
             <SyncError appStreamData={streamData} />
@@ -346,6 +358,14 @@ export const Details: React.FC<{
                     environmentName={appDetails.environmentName}
                 />
             )}
+
+            {deploymentStatus && (
+                <DeploymentModal
+                    key={params.appId + "-" + params.envId}
+                    appDetailsAPI={fetchAppDetailsInTime}
+                    close={(e) => toggleDeploymentStatus(false)}
+                />)}
+
             {showScanDetailsModal ? <ScanDetailsModal
                 showAppInfo={false}
                 uniqueId={{
@@ -395,8 +415,8 @@ export const Details: React.FC<{
                             ) : hibernateConfirmationModal === 'hibernate' ? (
                                 `Hibernate App`
                             ) : (
-                                'Restore App'
-                            )}
+                                        'Restore App'
+                                    )}
                         </button>
                     </ConfirmationDialog.ButtonGroup>
                 </ConfirmationDialog>
@@ -1147,7 +1167,7 @@ const MaterialCard: React.FC<{
                 <div className="material-sync-card--message">
                     <div className="ellipsis-right">
                         Deployed{' '}
-                        <span className="fw-6 fs-12">{moment(lastDeployedTime, 'YYYY-MM-DDTHH:mm:ssZ').fromNow()}</span>{' '}
+                        <div className="fw-6 flex fs-12">{moment(lastDeployedTime, 'YYYY-MM-DDTHH:mm:ssZ').fromNow()}</div>{' '}
                         by <span className="fw-6 fs-12">{lastDeployedBy}</span>
                     </div>
                     <Link to={getAppCDURL(appId, envId)} type="button" className="anchor fs-12 fw-6 p-0">
@@ -1171,6 +1191,8 @@ const MaterialCard: React.FC<{
                     environmentName={appDetails.environmentName}
                 />
             )}
+
+
             {hiberbateConfirmationModal && (
                 <ConfirmationDialog>
                     <ConfirmationDialog.Icon
@@ -1205,8 +1227,8 @@ const MaterialCard: React.FC<{
                             ) : hiberbateConfirmationModal === 'hibernate' ? (
                                 `Hibernate App`
                             ) : (
-                                'Restore App'
-                            )}
+                                        'Restore App'
+                                    )}
                         </button>
                     </ConfirmationDialog.ButtonGroup>
                 </ConfirmationDialog>
@@ -1245,25 +1267,30 @@ export const ProgressStatus: React.FC<{
     }
 
     return (
-        <VisibleModal className="app-status__material-modal">
+        <VisibleModal className="app-status__material-modal flex right">
             <div className="app-status-detai">
-                <div className="title flex left">
-                    App status detail
-                    <div className="fa fa-close" onClick={close} />
+
+                <div className="title flex pl-20 pr-20 pt-12 flex-align-center flex-justify" >
+                    <div>App status detail</div>
+                    <button type="button" className="transparent flex icon-dim-24" onClick={close}>
+                        <Close className="icon-dim-24" />
+                    </button>
                 </div>
-                <div className="flex left">
+                <div className="flex left pl-20 pr-20  pb-12" style={{ borderBottom: "1px solid #d0d4d9" }}>
                     <div className={`subtitle app-summary__status-name f-${status.toLowerCase()} mr-16`}>{status}</div>
                     {message && <div>{message}</div>}
                 </div>
+
                 {status.toLowerCase() !== 'missing' && (
                     <div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    {['name', 'status', 'message'].map((n) => (
-                                        <th>{n}</th>
+                        <table className="mt-20" style={{ borderCollapse: "collapse" }}>
+                            <thead >
+                                <tr >
+                                    {['NAME', 'STATUS', 'MESSGAE'].map((n) => (
+                                        <th style={{ width: "40%", borderBottom: "1px solid #edf1f5" }} className="cnn-7 pl-15 pt-28">{n}</th>
                                     ))}
                                 </tr>
+                                {/* <div className="divider"/> */}
                             </thead>
                             <tbody>
                                 {nodes &&
@@ -1272,15 +1299,15 @@ export const ProgressStatus: React.FC<{
                                         .map((kind) =>
                                             Array.from(nodes.nodes[kind] as Map<string, any>).map(([nodeName, nodeDetails]) => (
                                                 <tr key={`${nodeDetails.kind}/${nodeDetails.name}`}>
-                                                    <td valign="top">
+                                                    <td valign="top" className="pt-15 pl-15">
                                                         <div className="kind-name">
-                                                            <div>{nodeDetails.kind}/</div>
+                                                            <div className="fw-6 cn-9"> {nodeDetails.kind}/</div>
                                                             <div className="ellipsis-left">{nodeDetails.name}</div>
                                                         </div>
                                                     </td>
                                                     <td
                                                         valign="top"
-                                                        className={`app-summary__status-name f-${nodeDetails.health && nodeDetails.health.status
+                                                        className={`pt-15 pl-15 app-summary__status-name f-${nodeDetails.health && nodeDetails.health.status
                                                             ? nodeDetails.health.status.toLowerCase()
                                                             : ''
                                                             }`}
@@ -1291,7 +1318,7 @@ export const ProgressStatus: React.FC<{
                                                                 ? nodeDetails.health.status
                                                                 : ''}
                                                     </td>
-                                                    <td valign="top">
+                                                    <td valign="top" className="pt-15 pl-15">
                                                         <div
                                                             style={{
                                                                 display: 'grid',
@@ -1314,6 +1341,145 @@ export const ProgressStatus: React.FC<{
                         </table>
                     </div>
                 )}
+            </div>
+        </VisibleModal>
+    );
+};
+
+export const DeploymentModal: React.FC<{
+    appDetailsAPI: (appId: string, envId: string, timeout: number) => Promise<any>;
+    close: (...args) => void;
+
+
+}> = ({ appDetailsAPI, close }) => {
+    const params = useParams<{ appId: string; envId: string }>();
+    const [appDetailsResult, setAppDetailsResult] = useState(undefined);
+    const appDetails = appDetailsResult?.result;
+    let gitPushStep = appDetails?.deploymentStatus?.gitPushStep?.status.toLowerCase()
+    let gitPullStep = appDetails?.deploymentStatus?.gitPullStep?.status.toLowerCase()
+    let configApplyStep = appDetails?.deploymentStatus?.configApplyStep?.status.toLowerCase()
+    let k8sDeploy = appDetails?.deploymentStatus?.k8sDeploy?.status.toLowerCase()
+
+    useEffect(() => {
+        callAppDetailsAPI();
+    }, appDetailsResult)
+
+    async function callAppDetailsAPI() {
+        try {
+            let response = await appDetailsAPI(params.appId, params.envId, 25000);
+            setAppDetailsResult(response);
+        } catch (error) {
+            if (!appDetailsResult) {
+                // setAppDetailsError(error);
+            }
+        }
+    }
+    { console.log(appDetails) }
+    return (
+        <VisibleModal className="app-status__material-modal flex right ">
+            <div className="bcn-0 deployment-status">
+                <div className="pl-20 pr-20 pt-10 pb-10 flex flex-align-center flex-justify">
+                    <div>
+                        <div className="fs-20 fw-6 ">
+                            <div>Deployment status</div>
+                        </div>
+                    </div>
+                    <button type="button" className="transparent flex icon-dim-24" onClick={close}>
+                        <Close className="icon-dim-24" />
+                    </button>
+                </div>
+                <div className="divider"></div>
+                <div>
+                    <div className="ml-24 mr-24 mt-10" >
+                        <div className="flex left ">
+                            <div className="pt-8 pb-13 fs-14 cn-9">1/4</div>
+                            <div className="mr-18 ml-17 ">
+                                <div className="no-line" />
+                                {gitPushStep === "waiting" ? <Waiting className="icon-dim-20" /> : ""}
+                                {gitPushStep === "in_progress" ? <Progressing /> : ""}
+                                {gitPushStep === "success" ? <Success className="icon-dim-20" /> : ""}
+                                {gitPushStep === "error" ? <Failed className="icon-dim-20" /> : ""}
+                                {(gitPushStep === "success" || gitPushStep === "in_progress" || gitPushStep === "waiting") || gitPushStep === "error" ? null : <img src={Uncheck} className="icon-dim-20" />}
+                                <div className="line" />
+                            </div>
+                            <span className="pt-13 pb-13" >
+                                <div className={(gitPushStep === "error") ? "fs-14 cr-5" : gitPushStep === "in_progress" ? "fs-14 cn-9 fw-6" : (gitPushStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
+                                    Push to git
+                                    </div>
+                                <div className="cn-7">
+                                    {gitPushStep === "error" ? <div >Failed to apply Configuration to git.</div> : ""}
+                                    {gitPushStep === "in_progress" ? <div >Applying configuration to git.</div> : ""}
+                                    {gitPushStep === "success" ? <div >Configuration pushed to git.</div> : ""}
+                                    {gitPushStep === "waiting" ? <div style={{ opacity: 0.5 }}>Configuration will be pushed to git.</div> : ""}
+                                    {!(gitPushStep === "success" || gitPushStep === "in_progress" || gitPushStep === "error" || gitPushStep === "waiting") ? <div style={{ opacity: 0.5 }}>Configuration will be pushed to git.</div> : null}
+                                </div>
+                            </span>
+                        </div>
+                        <div className="flex left ">
+                            <div className="pt-8 pb-13 fs-14 cn-9">2/4</div>
+                            <div className="mr-18 ml-17"><div className="line" />
+                                { gitPushStep === "error" ? <img src={Uncheck} className="icon-dim-20" /> : gitPullStep === "waiting" ? <Waiting className="icon-dim-20" /> : gitPullStep === "in_progress" ? <Progressing /> : gitPullStep === "success" ? <Success className="icon-dim-20" /> : gitPullStep === "error" ? <Failed className="icon-dim-20" /> :  null } 
+                                {(gitPullStep === "success" || gitPullStep === "in_progress" || gitPullStep === "waiting" || gitPullStep === "error") ? null : <img src={Uncheck} className="icon-dim-20" />}
+                                <div className="line" />
+                            </div>
+                            <span className="pt-13 pb-13" >
+                                <div className={(gitPullStep === "error") ? "fs-14 cr-5" : (gitPullStep === "in_progress") ? "fs-14 cn-9 fw-6" : (gitPullStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
+                                    Pull by argocd
+                                </div>
+                                <div className="cn-7" >
+                                    {gitPullStep === "error" ? <div >Failed to apply configuration pulled by argocd to be applied to kubernetes.</div> : ""}
+                                    {gitPullStep === "in_progress" ? <div >Applying configuration pulled by argocd to be applied to kubernetes.</div> : ""}
+                                    {gitPullStep === "success" ? <div >Configuration pulled by argocd to be applied to kubernetes.</div> : ""}
+                                    {gitPullStep === "waiting" ? <div style={{ opacity: 0.5 }}>Configuration will be pulled by argocd to be applied to kubernetes.</div> : ""}
+                                    {!(gitPullStep === "success" || gitPullStep === "in_progress" || gitPullStep === "error" || gitPullStep === "waiting") ? <div style={{ opacity: 0.5 }}>Configuration will be pulled by argocd to be applied to kubernetes.</div> : null}
+                                </div>
+                            </span>
+                        </div>
+                        <div className="flex left ">
+                            <div className="pt-8 pb-13 fs-14 cn-9">3/4</div>
+                            <div className="mr-18 ml-17">
+                                <div className="line" />
+                                {gitPushStep === "error" || gitPullStep === "error" ? <img src={Uncheck} className="icon-dim-20" /> : configApplyStep === "waiting" ? <Waiting className="icon-dim-20" /> : configApplyStep === "in_progress" ? <Progressing /> : configApplyStep === "success" ? <Success className="icon-dim-20" /> : configApplyStep === "error" ? <Failed className="icon-dim-20" /> :  null } 
+                                {(configApplyStep === "success" || configApplyStep === "in_progress" || configApplyStep === "waiting" || configApplyStep === "error") ? null : <img src={Uncheck} className="icon-dim-20" />}
+                                <div className="line" />
+                            </div>
+                            <span className="pt-13 pb-13">
+                                <div className={(configApplyStep === "error") ? "fs-14 cr-5" : (configApplyStep === "in_progress") ? "fs-14 cn-9 fw-6" : (configApplyStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
+                                    Config apply
+                                </div>
+                                <div className="cn-7" >
+                                    {configApplyStep === "error" ? <div >Failed to apply configuration to kubernetes.</div> : ""}
+                                    {configApplyStep === "in_progress" ? <div>Applying configuration to kubernetes.</div> : ""}
+                                    {configApplyStep === "success" ? <div>Configuration pushed to kubernetes.</div> : ""}
+                                    {configApplyStep === "waiting" ? <div style={{ opacity: 0.5 }}>Configuration will be pushed to kubernetes.</div> : ""}
+                                    {!(configApplyStep === "success" || configApplyStep === "in_progress" || configApplyStep === "error" || configApplyStep === "waiting") ? <div style={{ opacity: 0.5 }}> Configuration will be pushed to kubernetes.</div> : null}
+                                </div>
+                            </span>
+                        </div>
+
+                        <div className="flex left ">
+                            {!(k8sDeploy === "in_progress") ? <div className="pt-8 pb-13 fs-14 cn-9">4/4</div> : <div className="pt-8 pb-13 fs-14 cn-9 fw-6">4/4</div>}
+                            <div className="mr-18 ml-17"><div className="line" />
+                                {gitPushStep === "error" || gitPullStep === "error" || configApplyStep === "error" ? <img src={Uncheck} className="icon-dim-20" /> : k8sDeploy === "waiting" ? <Waiting className="icon-dim-20" /> : k8sDeploy === "in_progress" ? <Progressing /> : k8sDeploy === "success" ? <Success className="icon-dim-20" /> : k8sDeploy === "error" ? <Failed className="icon-dim-20" /> : ""}
+                                {(k8sDeploy === "success" || k8sDeploy === "in_progress" || k8sDeploy === "waiting" || k8sDeploy === "error") ? null : <img src={Uncheck} className="icon-dim-20" />}
+                                <div className="no-line" /></div>
+                            <span className="pt-13 pb-13">
+                                <div className={(k8sDeploy === "error") ? "fs-14 cr-5" : (k8sDeploy === "in_progress") ? "fs-14 cn-9 fw-6" : (k8sDeploy === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
+                                    Finish rollout
+                                </div>
+                                <div className="cn-7" >
+                                    {k8sDeploy === "error" ? <div >Old replicas will be terminated.</div> : ""}
+                                    {k8sDeploy === "in_progress" ? <div>Applying configuration to Old replicas.</div> : ""}
+                                    {k8sDeploy === "success" ? <div>Old replicas terminated.</div> : ""}
+                                    {k8sDeploy === "waiting" ? <div style={{ opacity: 0.5 }}>Old replicas will be terminated.</div> : ""}
+                                    {!(k8sDeploy === "success" || k8sDeploy === "in_progress" || k8sDeploy === "error" || k8sDeploy === "waiting") ? <div>Old replicas will be terminated.</div> : null}
+                                </div>
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </VisibleModal>
     );
