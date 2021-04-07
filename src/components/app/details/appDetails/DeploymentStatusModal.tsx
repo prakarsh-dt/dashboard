@@ -1,12 +1,12 @@
 import React from 'react';
-import { Progressing, VisibleModal } from '../../../common';
-import Uncheck from '../../../../assets/img/ic-success@2x.png';
+import { Progressing, VisibleModal, Drawer } from '../../../common';
 import { ReactComponent as Close } from '../../../../assets/icons/ic-close.svg';
 import { ReactComponent as Waiting } from '../../../../assets/icons/ic-clock.svg';
 import { ReactComponent as Failed } from '../../../../assets/icons/appstatus/ic-appstatus-failed.svg';
 import { ReactComponent as Success } from '../../../../assets/icons/ic-outline-check.svg';
+import Uncheck from '../../../../assets/img/ic-success@2x.png';
 
-export function DeploymentStatusModal({ deploymentStatus, lastDeploymentStatus, close }) {
+export function DeploymentStatusModal({ appName, environmentName, deploymentStatus, lastDeploymentStatus, close }) {
     let gitPushStep = deploymentStatus?.gitPushStep?.status.toLowerCase()
     let gitPullStep = deploymentStatus?.gitPullStep?.status.toLowerCase()
     let configApplyStep = deploymentStatus?.configApplyStep?.status.toLowerCase()
@@ -19,14 +19,12 @@ export function DeploymentStatusModal({ deploymentStatus, lastDeploymentStatus, 
         description: "Push to git"
     }
 
-    return <VisibleModal className="">
-        <div className="bcn-0 app-details-status-modal">
-            <div className="pl-20 pr-20 pt-10 pb-10 flex flex-align-center flex-justify">
+    return <Drawer position="right" width="800px" onClose={close}>
+        <div className="app-details-status-modal bcn-0" onClick={(e) => e.stopPropagation()}>
+            <div className="pl-20 pr-20 pt-12 pb-12 flex flex-align-center flex-justify" style={{ borderBottom: "1px solid #d0d4d9" }}>
                 <div>
-                    <h2 className="fs-16 lh-1-5 fw-6 m-0">
-                        Deployment status
-                    </h2>
-                    <p className={`m-0 app-summary__status-name fs-14 fw-6 f-${status.toLowerCase()}`}>
+                    <h2 className="fs-16 lh-1-5 fw-6 m-0">Deployment status: {appName} / {environmentName}</h2>
+                    <p className={`m-0 capitalize app-summary__status-name fs-12 fw-6 f-${status.toLowerCase()}`}>
                         {status}
                     </p>
                 </div>
@@ -34,7 +32,6 @@ export function DeploymentStatusModal({ deploymentStatus, lastDeploymentStatus, 
                     <Close className="icon-dim-24" />
                 </button>
             </div>
-            <div className="divider"></div>
             <div className="ml-24 mr-24 mt-10">
                 <div className="position-rel add-line">
                     <div className="flex left ">
@@ -123,7 +120,7 @@ export function DeploymentStatusModal({ deploymentStatus, lastDeploymentStatus, 
                         <div className="pt-13 pb-13">
                             <div className={(k8sDeploy === "error") ? "fs-14 cr-5" : (k8sDeploy === "in_progress") ? "fs-14 cn-9 fw-6" : (k8sDeploy === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
                                 {k8sDeploy === "error" ? `${message.status.error}: ` : null}Rollout
-                        </div>
+                                </div>
                             <div className="cn-7" >
                                 {k8sDeploy === "error" ? <div >Error encountered during deployment.</div> : ""}
                                 {k8sDeploy === "in_progress" ? <div>Deployment is in progress.</div> : ""}
@@ -141,7 +138,7 @@ export function DeploymentStatusModal({ deploymentStatus, lastDeploymentStatus, 
                 </div>
             </div>
         </div>
-    </VisibleModal>
+    </Drawer>
 }
 
 
