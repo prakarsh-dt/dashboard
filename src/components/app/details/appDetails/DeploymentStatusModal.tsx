@@ -1,9 +1,10 @@
 import React from 'react';
-import { Progressing, VisibleModal, Drawer } from '../../../common';
+import { Progressing, Drawer } from '../../../common';
 import { ReactComponent as Close } from '../../../../assets/icons/ic-close.svg';
 import { ReactComponent as Waiting } from '../../../../assets/icons/ic-clock.svg';
 import { ReactComponent as Failed } from '../../../../assets/icons/appstatus/ic-appstatus-failed.svg';
 import { ReactComponent as Success } from '../../../../assets/icons/ic-outline-check.svg';
+import { ReactComponent as Unknown } from '../../../../assets/icons/appstatus/unknown.svg';
 import Uncheck from '../../../../assets/img/ic-success@2x.png';
 
 export function DeploymentStatusModal({ appName, environmentName, deploymentStatus, lastDeploymentStatus, close }) {
@@ -13,10 +14,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
     let k8sDeploy = deploymentStatus?.k8sDeploy?.status.toLowerCase()
     const status = lastDeploymentStatus || ""
     let message = {
-        status: {
-            error: "Error"
-        },
-        description: "Push to git"
+        error: "Error"
     }
 
     return <Drawer position="right" width="800px" onClose={close}>
@@ -43,7 +41,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                         </div>
                         <div className="pt-13 pb-13" >
                             <div className={(gitPushStep === "error") ? "fs-14 cr-5" : gitPushStep === "in_progress" ? "fs-14 cn-9 fw-`6" : (gitPushStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
-                                {gitPushStep === "error" ? `${message.status.error}: ${message.description}` : `${message.description}`}
+                                {gitPushStep === "error" ? `${message.error}: ` : null}Push to git
                             </div>
                             <div className="cn-7">
                                 {gitPushStep === "error" ? <div >Error in pushing configuration to git.</div> : ""}
@@ -53,7 +51,6 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                             </div>
                         </div>
                     </div>
-
                     {gitPushStep === "error" ? <div className="flex left ml-38">
                         <div className="w-100 cr-5 bcr-1 ml-24 p-12 br-4"><div className="cn-9 fw-6">Error Message:</div>
                             {deploymentStatus?.gitPushStep?.errorMessage}</div>
@@ -68,7 +65,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                         </div>
                         <div className="pt-13 pb-13" >
                             <div className={(gitPullStep === "error") ? "fs-14 cr-5" : (gitPullStep === "in_progress") ? "fs-14 cn-9 fw-6" : (gitPullStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
-                                {gitPullStep === "error" ? `${message.status.error}: ` : null}Pull from git
+                                {gitPullStep === "error" ? `${message.error}: ` : null}Pull from git
                         </div>
                             <div className="cn-7" >
                                 {gitPullStep === "error" ? <div >Error while pulling configuration from git .</div> : ""}
@@ -93,7 +90,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                         </div>
                         <div className="pt-13 pb-13">
                             <div className={(configApplyStep === "error") ? "fs-14 cr-5" : (configApplyStep === "in_progress") ? "fs-14 cn-9 fw-6" : (configApplyStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
-                                {configApplyStep === "error" ? `${message.status.error}: Apply configuration` : ` Apply configuration`}
+                                {configApplyStep === "error" ? `${message.error}: ` : null}Apply configuration
                             </div>
                             <div className="cn-7" >
                                 {configApplyStep === "success" ? <div>Configuration  applied to kubernetes.</div> : ""}
@@ -119,14 +116,13 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                         </div>
                         <div className="pt-13 pb-13">
                             <div className={(k8sDeploy === "error") ? "fs-14 cr-5" : (k8sDeploy === "in_progress") ? "fs-14 cn-9 fw-6" : (k8sDeploy === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
-                                {k8sDeploy === "error" ? `${message.status.error}: ` : null}Rollout
+                                {k8sDeploy === "error" ? `${message.error}: ` : null}Rollout
                                 </div>
                             <div className="cn-7" >
                                 {k8sDeploy === "error" ? <div >Error encountered during deployment.</div> : ""}
                                 {k8sDeploy === "in_progress" ? <div>Deployment is in progress.</div> : ""}
                                 {k8sDeploy === "success" ? <div>Deployment completed successfully.</div> : ""}
                                 {k8sDeploy === "waiting" ? <div style={{ opacity: 0.5 }}>Waiting for previous steps to complete.</div> : ""}
-                                {k8sDeploy === "unknown" ? <div style={{ opacity: 0.5 }}>Unable to ascertain the current status of Deployment, please check back in sometime (fix errors mentioned below).</div> : ""}
                                 {!(k8sDeploy === "success" || k8sDeploy === "in_progress" || k8sDeploy === "error" || k8sDeploy === "waiting") ? <div>Deployment will be completed.</div> : null}
                             </div>
                         </div>
@@ -143,11 +139,13 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
 
 
 function AppDeploymentStageStatusIcon({ status }) {
-
+    status = status?.toLowerCase();
     return <>
         {status === "success" ? <Success className="icon-dim-20" /> : null}
         {status === "in_progress" ? <Progressing /> : null}
         {status === "waiting" ? <Waiting className="icon-dim-20" /> : null}
         {status === "error" ? <Failed className="icon-dim-20" /> : null}
+        {status === "unknown" ? <Unknown className="icon-dim-20" /> : null}
+
     </>
 }
