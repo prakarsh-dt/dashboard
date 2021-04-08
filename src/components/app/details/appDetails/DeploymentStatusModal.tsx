@@ -22,7 +22,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
             <div className="pl-20 pr-20 pt-12 pb-12 flex flex-align-center flex-justify" style={{ borderBottom: "1px solid #d0d4d9" }}>
                 <div>
                     <h2 className="fs-16 lh-1-5 fw-6 m-0">Deployment status: {appName} / {environmentName}</h2>
-                    <p className={`m-0 capitalize app-summary__status-name fs-12 fw-6 f-${status.toLowerCase()}`}>
+                    <p className={`m-0 text-uppercase app-summary__status-name fs-12 fw-6 f-${status.toLowerCase()}`}>
                         {status}
                     </p>
                 </div>
@@ -35,9 +35,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                     <div className="flex left ">
                         <div className="pt-8 pb-13 fs-14 cn-9">1/4</div>
                         <div className="mr-18 ml-17 icon-dim-20 bcn-0 position-rel">
-                            {(gitPushStep === "success" || gitPushStep === "in_progress" || gitPushStep === "error")
-                                ? <AppDeploymentStageStatusIcon status={gitPushStep} />
-                                : <img src={Uncheck} className="icon-dim-20" />}
+                            <AppDeploymentStageStatusIcon status={gitPushStep} />
                         </div>
                         <div className="pt-13 pb-13" >
                             <div className={(gitPushStep === "error") ? "fs-14 cr-5" : gitPushStep === "in_progress" ? "fs-14 cn-9 fw-`6" : (gitPushStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
@@ -60,8 +58,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                     <div className="flex left ">
                         <div className="pt-8 pb-13 fs-14 cn-9">2/4</div>
                         <div className="mr-18 ml-17 icon-dim-20 bcn-0 position-rel">
-                            {gitPushStep === "error" ? <img src={Uncheck} className="icon-dim-20" />
-                                : <AppDeploymentStageStatusIcon status={gitPullStep} />}
+                            <AppDeploymentStageStatusIcon status={gitPullStep} />
                         </div>
                         <div className="pt-13 pb-13" >
                             <div className={(gitPullStep === "error") ? "fs-14 cr-5" : (gitPullStep === "in_progress") ? "fs-14 cn-9 fw-6" : (gitPullStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
@@ -85,8 +82,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                     <div className="flex left">
                         <div className="pt-8 pb-13 fs-14 cn-9">3/4</div>
                         <div className="mr-18 ml-17 icon-dim-20 bcn-0 position-rel">
-                            {gitPushStep === "error" || gitPullStep === "error" ? <img src={Uncheck} className="icon-dim-20" />
-                                : <AppDeploymentStageStatusIcon status={configApplyStep} />}
+                            <AppDeploymentStageStatusIcon status={configApplyStep} />
                         </div>
                         <div className="pt-13 pb-13">
                             <div className={(configApplyStep === "error") ? "fs-14 cr-5" : (configApplyStep === "in_progress") ? "fs-14 cn-9 fw-6" : (configApplyStep === "success") ? "fs-14 cn-9 " : "fs-14 o-5"}>
@@ -110,8 +106,7 @@ export function DeploymentStatusModal({ appName, environmentName, deploymentStat
                     <div className="flex left">
                         {!(k8sDeploy === "in_progress") ? <div className="pt-8 pb-13 fs-14 cn-9">4/4</div> : <div className="pt-8 pb-13 fs-14 cn-9 fw-6">4/4</div>}
                         <div className="mr-18 ml-17 icon-dim-20 bcn-0 position-rel">
-                            {gitPushStep === "error" || gitPullStep === "error" || configApplyStep === "error" ? <img src={Uncheck} className="icon-dim-20" />
-                                : <AppDeploymentStageStatusIcon status={k8sDeploy} />}
+                            <AppDeploymentStageStatusIcon status={k8sDeploy} />
                             {(k8sDeploy === "success" || k8sDeploy === "in_progress" || k8sDeploy === "waiting" || k8sDeploy === "error") ? null : <img src={Uncheck} className="icon-dim-20" />}
                         </div>
                         <div className="pt-13 pb-13">
@@ -143,9 +138,8 @@ function AppDeploymentStageStatusIcon({ status }) {
     return <>
         {status === "success" ? <Success className="icon-dim-20" /> : null}
         {status === "in_progress" ? <Progressing /> : null}
-        {status === "waiting" ? <Waiting className="icon-dim-20" /> : null}
+        {status === "waiting" ? <Waiting className="icon-dim-20 o-5" /> : null}
         {status === "error" ? <Failed className="icon-dim-20" /> : null}
         {status === "unknown" ? <Unknown className="icon-dim-20" /> : null}
-
     </>
 }
