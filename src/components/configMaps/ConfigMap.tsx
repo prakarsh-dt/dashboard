@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 import CodeEditor from '../CodeEditor/CodeEditor'
 import YAML from 'yaml'
 import { DOCUMENTATION, PATTERNS } from '../../config';
-import Reload from '../Reload/Reload';
 import arrowTriangle from '../../assets/icons/appstatus/ic-dropdown.svg';
 import { ReactComponent as File } from '../../assets/icons/ic-file.svg';
 import { ReactComponent as Add } from '../../assets/icons/ic-add.svg';
@@ -459,7 +458,7 @@ export function ConfigMapForm({ appChartRef, id, appId, name = "", external, dat
                     label={"Volume mount path*"}
                     placeholder={"/directory-path"}
                     helperText={"Keys are mounted as files to volume"}
-                    error={volumeMountPath.error}
+                    error={[{ name: volumeMountPath.error }]}
                     onChange={e => setVolumeMountPath({ value: e.target.value, error: "" })} />
             </div> : null}
             {!isExternalValues && selectedTab === 'Data Volume' ?
@@ -511,7 +510,7 @@ export function ConfigMapForm({ appChartRef, id, appId, name = "", external, dat
                     label={""}
                     disabled={isChartVersion309OrBelow}
                     placeholder={"eg. 0400 or 400"}
-                    error={filePermissionValue.error}
+                    error={[{ name: filePermissionValue.error }]}
                     onChange={handleFilePermission} />
             </div> : ""}
             {!isExternalValues && <div className="flex left mb-16">

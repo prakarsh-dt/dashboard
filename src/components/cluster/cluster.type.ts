@@ -65,3 +65,81 @@ export interface ClusterListProps extends RouteComponentProps<{}> {
     // }[];
     // clusterEnvMap: any;
 }
+
+
+export interface ClusterListProps extends RouteComponentProps<{}> {
+
+}
+
+export default interface Config {
+    bearer_token: string;
+}
+
+export interface Cluster {
+    id?: number;
+    cluster_name: string;
+    prometheus_url: string;
+    server_url: string;
+    userName: string;
+    password: string;
+    bearer_token: string;
+    tlsClientKey: string;
+    tlsClientCert: string;
+    authType: string;
+    active: boolean;
+}
+
+export interface ClusterFormState {
+    saveLoading: boolean;
+    isFormLoading: boolean;
+    form: Cluster;
+    isError: {
+        cluster_name: { name: string; }[];
+        bearer_token: { name: string; }[];
+        prometheus_url: { name: string; }[];
+        server_url: { name: string; }[];
+        userName: { name: string; }[];
+        password: { name: string; }[];
+        tlsClientKey: { name: string; }[];
+        tlsClientCert: { name: string; }[];
+    };
+}
+
+export interface ClusterFormProps extends RouteComponentProps<{}> { }
+
+export interface EnvironmentValue {
+    environment_name: string;
+    namespace: string;
+    isProduction: string;
+    prometheus_endpoint: string;
+    cluster_id: number;
+}
+
+export interface isError {
+    environment_name: string;
+    namespace: string;
+}
+
+export interface EnvironmentState {
+    id: number;
+    loading: boolean;
+    isError: isError;
+    form: EnvironmentValue;
+    environment: [];
+    isclosed: boolean;
+    saveLoading: boolean;
+}
+
+export interface EnvironmentProps extends RouteComponentProps<{}> {
+    environment_name: string;
+    namespace: string;
+    id: number;
+    cluster_id: number;
+    handleClose: boolean;
+    prometheus_endpoint: string;
+    isProduction: boolean;
+    isNamespaceMandatory: boolean;
+    ignore: boolean;
+    ignoreError: string;
+    close: () => void;
+}

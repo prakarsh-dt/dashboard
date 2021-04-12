@@ -64,7 +64,7 @@
         }
     }
 
-    .protected-input__toggle{
+    .protected-input__toggle {
         position: absolute;
         right: 10px;
         top: 50%;
@@ -76,16 +76,6 @@
         display: flex;
         align-items: center;
         margin-top: 4px;
-
-        // &:before {
-        //     content: '';
-        //     background: url('../../assets/icons/misc/errorInfo.svg');
-        //     height: 14px;
-        //     width: 14px;
-        //     display: inline-block;
-        //     background-size: contain;
-        //     margin-right: 4px;
-        // }
     }
 
     textarea {
@@ -132,6 +122,9 @@
     background: white;
     grid-column-gap: 8px;
     cursor: pointer;
+    grid-gap: 16px;
+    border-radius: inherit;
+
 
     .toggle__switch,
     .tooltip-button {
@@ -164,34 +157,23 @@
         margin-left: 8px;
         line-height: 23px;
     }
-
-    .list__logo.git-logo {
-        width: 24px;
-        height: 24px;
-        background: url('../../assets/icons/git/git.svg');
-
-        &.github {
-            background: url('../../assets/icons/git/github.svg')
-        }
-
-        &.gitlab {
-            background: url('../../assets/icons/git/gitlab.svg')
-        }
-
-        &.bitbucket {
-            background: url('../../assets/icons/git/bitbucket.svg')
-        }
-
-        &.docker {
-            background: url('../../assets/icons/git/docker.svg')
-        }
-    }
 }
 
-.list__add-item {
-    color: var(--B500);
-    font-weight: 600;
-    font-size: 14px;
+.list--create-expanded {
+   
+    grid-template-columns: auto 24px;
+}
+
+.list--edit-collapsed {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 24px auto 32px 24px;
+}
+
+.list--edit-expanded {
+    display: grid;
+    width: 100%;
+    grid-template-columns: auto 32px 24px;
 }
 
 .cluster-list {
@@ -205,7 +187,7 @@
         border: unset;
         margin-bottom: unset;
         grid-template-columns: 1fr 24px;
-        align-items: center;
+        grid-gap: 16px;
     }
 
     &.cluster-list--create {
@@ -232,8 +214,7 @@
         padding: 0 24px 24px 24px;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        grid-row-gap: 16px;
-        grid-column-gap: 16px;
+        grid-gap: 16px;
 
         .list {
             border-radius: 4px;
@@ -244,10 +225,6 @@
             border: 1px #d6dbdf dashed;
         }
     }
-}
-
-.cluster-list--create {
-    border-style: dashed;
 }
 
 .collapsed-list {
@@ -261,8 +238,6 @@
 }
 
 .collapsed-list {
-
-    &.collapsed-list--git,
     &.collapsed-list--docker {
         border: 1px solid #d6dbdf;
         margin-bottom: 16px;
@@ -272,12 +247,6 @@
     }
 
     &.collapsed-list--create {
-        .add-icon {
-            background: url('../../assets/icons/ic-add.svg');
-            width: 24px;
-            height: 24px;
-            background-size: contain;
-        }
 
         .list__title {
             color: var(--B500);
@@ -362,8 +331,6 @@
 }
 
 .cluster-form {
-    padding: 24px;
-
     .form__row--bearer-token .bearer-token {
         display: flex;
         width: 100%;

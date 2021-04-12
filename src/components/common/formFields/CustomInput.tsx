@@ -11,20 +11,25 @@ export interface CustomInputProps {
     autoFocus?: boolean;
     placeholder?: string;
     disabled?: boolean;
-    error?: string;
+    error?: { name: string }[];
     helperText?: string;
     name?: string;
     tabIndex?: number;
-    autoComplete: string;
+    autoComplete?: string;
     onChange: (...args) => void;
 }
 
 export class CustomInput extends Component<CustomInputProps, any> {
 
     render() {
-        let isError: boolean = !!this.props.error;
-        let type = this.props.type || 'text';
+        let isError: boolean = this.props.error && (this.props.error.length > 0);
+        let type: string = this.props.type || 'text';
+        isError = isError && !!this.props.error?.reduce((str, error) => {
+            str = str + error.name;
+            return str;
+        }, "");
         let labelClasses = `form__label`;
+
         if (this.props.labelClassName) labelClasses = `${labelClasses} ${this.props.labelClassName}`;
         return <div>
             <label className={labelClasses}>{this.props.label}</label>
@@ -34,19 +39,23 @@ export class CustomInput extends Component<CustomInputProps, any> {
                 tabIndex={this.props.tabIndex}
                 name={this.props.name}
                 placeholder={this.props.placeholder}
-                className={isError ? "form__input" : "form__input"}
+                className={isError ? "form__input form__input--error" : "form__input"}
                 onChange={e => { e.persist(); this.props.onChange(e) }}
                 value={this.props.value}
                 disabled={this.props.disabled} />
-            {this.props.error && <div className="form__error">
+            {isError && <div className="form__error">
                 <Error className="form__icon form__icon--error" />
-                {this.props.error}
+                {this.props.error.map((error) => {
+                    return error.name
+                })}
             </div>}
 
-            {this.props.helperText ? <> <div className="form__text-field-info">
-                <Info className="form__icon form__icon--info" />
-                <p className="sentence-case">{this.props.helperText}</p>
-            </div> </> : null}
+            {this.props.helperText ? <>
+                <div className="form__text-field-info">
+                    <Info className="form__icon form__icon--info" />
+                    <p className="sentence-case">{this.props.helperText}</p>
+                </div>
+            </> : null}
         </div>
     }
 }

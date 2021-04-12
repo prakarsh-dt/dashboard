@@ -1,20 +1,19 @@
 import React, { useState, useMemo, Component } from 'react'
-import { showError, Pencil, useForm, Progressing, CustomPassword, VisibleModal, sortCallback } from '../common';
-import { RadioGroup, RadioGroupItem } from '../common/formFields/RadioGroup';
-import { List, CustomInput } from '../globalConfigurations/GlobalConfiguration'
-import { getClusterList, saveCluster, updateCluster, saveEnvironment, updateEnvironment, getEnvironmentList, getCluster, retryClusterInstall } from './cluster.service';
-import { ResizableTextarea } from '../configMaps/ConfigMap'
-import { ReactComponent as Close } from '../../assets/icons/ic-close.svg';
+import { showError, Pencil, Progressing, sortCallback } from '../common';
+import { List } from '../globalConfigurations/GlobalConfiguration'
+import { getClusterList, getEnvironmentList, getCluster, retryClusterInstall } from './cluster.service';
 import { ReactComponent as Add } from '../../assets/icons/ic-add.svg';
 import { ReactComponent as Database } from '../../assets/icons/ic-env.svg';
 import { ReactComponent as ClusterIcon } from '../../assets/icons/ic-cluster.svg';
 import { ClusterComponentModal } from './ClusterComponentModal';
 import { ClusterInstallStatus } from './ClusterInstallStatus';
-import { POLLING_INTERVAL, ClusterListProps, AuthenticationType } from './cluster.type';
+import { POLLING_INTERVAL, ClusterListProps } from './cluster.type';
 import { useHistory } from 'react-router';
 import { toast } from 'react-toastify';
 import { DOCUMENTATION, ViewType } from '../../config';
 import { getEnvName } from './cluster.util';
+import { ClusterForm } from './ClusterForm';
+import { Environment } from './Environment';
 import Reload from '../Reload/Reload';
 
 export default class ClusterList extends Component<ClusterListProps, any> {
@@ -166,16 +165,20 @@ function Cluster({ id: clusterId, cluster_name, defaultClusterComponent, agentIn
     let envName: string = getEnvName(defaultClusterComponent, agentInstallationStage);
 
     return <>
-        <article className={`cluster-list ${clusterId ? 'cluster-list--update' : 'cluster-list--create collapsed-list collapsed-list--create'}`}>
+        <article className={`cluster-list ${clusterId ? '' : 'cluster-list--create collapsed-list collapsed-list--create'}`}>
             {!editMode ? <>
-                <List key={clusterId} onClick={clusterId ? () => { } : e => toggleEditMode(t => !t)}>
-                    {!clusterId && <List.Logo><Add className="icon-dim-24 fcb-5 vertical-align-middle" /></List.Logo>}
+                {clusterId ? <List onClick={(e) => toggleEditMode(t => !t)}>
                     <div className="flex left">
-                        {clusterId ? <ClusterIcon className="icon-dim-24 vertical-align-middle mr-16" /> : null}
-                        <List.Title title={cluster_name || "Add cluster"} subtitle={server_url} className="fw-6" />
+                        <List.Logo><ClusterIcon className="icon-dim-24 vertical-align-middle mr-16" /></List.Logo>
+                        <List.Title title={cluster_name} subtitle={server_url} className="fw-6 cb-5" />
                     </div>
-                    {clusterId && <List.DropDown src={<Pencil color="#b1b7bc" onClick={handleEdit} />} />}
+                    <List.DropDown src={<Pencil color="#b1b7bc" onClick={handleEdit} />} />
                 </List>
+                    : <List onClick={e => toggleEditMode(t => !t)}>
+                        <List.Logo><Add className="icon-dim-24 fcb-5" /></List.Logo>
+                        <h3 className="fw-6 cb-5 fs-14 m-0">Add cluster</h3>
+                    </List>
+                }
                 {clusterId ? <hr className="mt-0 mb-16" /> : null}
                 {clusterId ? <ClusterInstallStatus agentInstallationStage={agentInstallationStage}
                     envName={envName}
@@ -197,264 +200,8 @@ function Cluster({ id: clusterId, cluster_name, defaultClusterComponent, agentIn
                     ))}
                 </div>}
             </>
-                : <>
-                    <ClusterForm {...{ id: clusterId, cluster_name, server_url, active, config, environments, toggleEditMode, reload, prometheus_url, prometheusAuth }} /></>}
+                : <ClusterForm {...{ id: clusterId, cluster_name, server_url, active, config, environments, toggleEditMode, reload, prometheus_url, prometheusAuth }} />}
         </article>
         {environment && <Environment {...environment} handleClose={handleClose} isNamespaceMandatory={Array.isArray(environments) && environments.length > 0} />}
     </>
-}
-
-function ClusterForm({ id, cluster_name, server_url, active, config, environments, toggleEditMode, reload, prometheus_url, prometheusAuth }) {
-    const [loading, setLoading] = useState(false);
-    let authenTicationType = prometheusAuth && prometheusAuth.userName ? AuthenticationType.BASIC : AuthenticationType.ANONYMOUS
-    const { state, disable, handleOnChange, handleOnSubmit } = useForm(
-        {
-            cluster_name: { value: cluster_name, error: "" },
-            url: { value: server_url, error: "" },
-            userName: { value: prometheusAuth?.userName, error: "" },
-            password: { value: prometheusAuth?.password, error: "" },
-            tlsClientKey: { value: prometheusAuth?.tlsClientKey, error: "" },
-            tlsClientCert: { value: prometheusAuth?.tlsClientCert, error: "" },
-            token: { value: config && config.bearer_token ? config.bearer_token : "", error: "" },
-            endpoint: { value: prometheus_url || "", error: "" },
-            authType: { value: authenTicationType, error: "" }
-        },
-        {
-            cluster_name: {
-                required: true,
-                validator: { error: `Allowed: 5-16 chars 'a-z' '0-9' '.'  '-' Start/end with alphanumeric`, regex: /^[a-z](-?\.?[a-z0-9]){5,16}$/ }
-            },
-            url: {
-                required: true,
-                validator: { error: 'URL is required', regex: /^.*$/ }
-            },
-            authType: {
-                required: false,
-                validator: { error: 'Authentication Type is required', regex: /^(?!\s*$).+/ }
-            },
-            userName: {
-                required: false,
-                validator: { error: 'username is required', regex: /^(?!\s*$).+/ }
-            },
-            password: {
-                required: false,
-                validator: { error: 'password is required', regex: /^(?!\s*$).+/ }
-            },
-            tlsClientKey: {
-                required: false,
-                validator: { error: 'TLS Key is required', regex: /^(?!\s*$).+/ }
-            },
-            tlsClientCert: {
-                required: false,
-                validator: { error: 'TLS Certificate is required', regex: /^(?!\s*$).+/ }
-            },
-            token: {
-                required: true,
-                validator: { error: 'token is required', regex: /[^]+/ }
-            },
-            endpoint: {
-                required: true,
-                validator: { error: 'endpoint is required', regex: /^.*$/ }
-            }
-        }, onValidation);
-
-    async function onValidation() {
-
-        let payload = {
-            id,
-            cluster_name: state.cluster_name.value,
-            server_url: state.url.value,
-            config: { bearer_token: state.token.value },
-            active,
-            prometheus_url: state.endpoint.value,
-            prometheusAuth: {
-                userName: "",
-                password: ""
-            }
-        }
-
-        if (state.authType.value === AuthenticationType.BASIC) {
-            let isValid = state.userName?.value && state.password?.value;
-            if (!isValid) {
-                toast.error("Please add both username and password");
-                return;
-            }
-            else {
-                payload.prometheusAuth['userName'] = state.userName.value || "";
-                payload.prometheusAuth['password'] = state.password.value || "";
-            }
-        }
-        if (state.tlsClientKey.value || state.tlsClientCert.value) {
-            let isValid = state.tlsClientKey.value?.length && state.tlsClientCert.value?.length;
-            if (!isValid) {
-                toast.error("Please add both TLS Key and Certificate");
-                return;
-            }
-            else {
-                payload.prometheusAuth['tlsClientKey'] = state.tlsClientKey.value || "";
-                payload.prometheusAuth['tlsClientCert'] = state.tlsClientCert.value || "";
-            }
-        }
-        const api = id ? updateCluster : saveCluster
-        try {
-            setLoading(true)
-            const { result } = await api(payload)
-            toast.success(`Successfully ${id ? 'updated' : 'saved'}.`)
-            reload()
-            toggleEditMode(e => !e)
-        }
-        catch (err) { showError(err) }
-        finally {
-            setLoading(false)
-        }
-    }
-    return <form action="" className="cluster-form" onSubmit={handleOnSubmit}>
-        <h2 className="form__title">Edit cluster</h2>
-        <div className="form__row">
-            <CustomInput autoComplete="off" name="cluster_name" value={state.cluster_name.value} error={state.cluster_name.error} onChange={handleOnChange} label="Name*" />
-        </div>
-        <hr></hr>
-        <div className="form__input-header mb-8">Kubernetes Cluster Info</div>
-        <div className="form__row">
-            <CustomInput autoComplete="off" name="url" value={state.url.value} error={state.url.error} onChange={handleOnChange} label="Server URL*" />
-        </div>
-        <div className="form__row form__row--bearer-token flex column left top">
-            <label htmlFor="" className="form__label">Bearer token*</label>
-            <div className="bearer-token">
-                <ResizableTextarea className="resizable-textarea__with-max-height" name="token" value={config && config.bearer_token ? config.bearer_token : ""} onChange={handleOnChange} />
-            </div>
-            {state.token.error && <label htmlFor="" className="form__error">{state.token.error}</label>}
-        </div>
-        <hr></hr>
-        <div className="form__input-header mb-8">Prometheus Info</div>
-        <div className="form__row">
-            <CustomInput autoComplete="off" name="endpoint" value={state.endpoint.value} error={state.endpoint.error} onChange={handleOnChange} label="Prometheus endpoint*" />
-        </div>
-        <div className="form__row">
-            <span className="form__label">Authentication Type*</span>
-            <RadioGroup value={state.authType.value} name={`authType`} onChange={handleOnChange}>
-                <RadioGroupItem value={AuthenticationType.BASIC}> Basic  </RadioGroupItem>
-                <RadioGroupItem value={AuthenticationType.ANONYMOUS}>  Anonymous  </RadioGroupItem>
-            </RadioGroup>
-        </div>
-        {state.authType.value === AuthenticationType.BASIC ?
-            <div className="form__row form__row--flex">
-                <div className="w-50 mr-8">
-                    <CustomInput name="userName" value={state.userName.value} error={state.userName.error} onChange={handleOnChange} label="Username*" />
-                </div>
-                <div className="w-50 ml-8">
-                    <CustomPassword name="password" value={state.password.value} error={state.userName.error} onChange={handleOnChange} label="Password*" />
-                </div>
-            </div>
-            : null}
-        <div className="form__row">
-            <span className="form__label">TLS Key</span>
-            <ResizableTextarea className="resizable-textarea__with-max-height w-100" name="tlsClientKey" value={state.tlsClientKey.value} onChange={handleOnChange} />
-        </div>
-        <div className="form__row">
-            <span className="form__label">TLS Certificate</span>
-            <ResizableTextarea className="resizable-textarea__with-max-height w-100" name="tlsClientCert" value={state.tlsClientCert.value} onChange={handleOnChange} />
-        </div>
-        <div className="form__buttons">
-            <button className="cta cancel" type="button" onClick={e => toggleEditMode(t => !t)}>Cancel</button>
-            <button className="cta">{loading ? <Progressing /> : 'Save cluster'}</button>
-        </div>
-    </form>
-}
-
-function Environment({ environment_name, namespace, id, cluster_id, handleClose, prometheus_endpoint, isProduction, isNamespaceMandatory = true }) {
-    const [loading, setLoading] = useState(false)
-    const [ignore, setIngore] = useState(false)
-    const [ignoreError, setIngoreError] = useState("")
-    const { state, disable, handleOnChange, handleOnSubmit } = useForm(
-        {
-            environment_name: { value: environment_name, error: "" },
-            namespace: { value: namespace, error: "" },
-            isProduction: { value: isProduction ? "true" : "false", error: "" },
-        },
-        {
-            environment_name: {
-                required: true,
-                validator: { error: `Allowed: 5-25 chars 'a-z' '0-9' '.'  '-' Start/end with alphanumeric`, regex: /^[a-z](-?\.?[a-z0-9]){5,25}$/  }
-            },
-            namespace: {
-                required: isNamespaceMandatory,
-                validator: { error: `Allowed: 5-25 chars 'a-z' '0-9' '.'  '-' Start/end with alphanumeric`, regex: /^[a-z](-?\.?[a-z0-9]){5,25}$/ }
-            },
-            isProduction: {
-                required: true,
-                validator: { error: 'token is required', regex: /[^]+/ }
-            },
-        }, onValidation);
-
-    async function onValidation() {
-        if (!state.namespace.value && !ignore) {
-            setIngoreError("Enter a namespace or select ignore namespace")
-            return
-        }
-        let payload = {
-            id,
-            environment_name: state.environment_name.value,
-            cluster_id,
-            prometheus_endpoint,
-            namespace: state.namespace.value || "",
-            active: true,
-            default: state.isProduction.value === 'true',
-        }
-
-        const api = id ? updateEnvironment : saveEnvironment
-        try {
-            setLoading(true)
-            await api(payload, id)
-            toast.success(`Successfully ${id ? 'updated' : 'saved'}`)
-            handleClose(true)
-        }
-        catch (err) {
-            showError(err)
-        }
-        finally {
-            setLoading(false)
-        }
-    }
-
-    return <VisibleModal className="environment-create-modal" close={handleClose}>
-        <form className="environment-create-body" onClick={(e) => e.stopPropagation()} onSubmit={handleOnSubmit} >
-            <div className="form__row">
-                <div className="flex left">
-                    <div className="form__title">{id ? 'Update Environment' : 'New Environment'}</div>
-                    <Close className="icon-dim-24 align-right cursor" onClick={e => handleClose(false)} />
-                </div>
-            </div>
-            <div className="form__row">
-                <CustomInput autoComplete="off" disabled={!!environment_name} name="environment_name" value={state.environment_name.value} error={state.environment_name.error} onChange={handleOnChange} label="Environment Name*" />
-            </div>
-            <div className="form__row form__row--namespace">
-                <CustomInput disabled={!!namespace || ignore} name="namespace" value={state.namespace.value} error={state.namespace.error} onChange={handleOnChange} label={`Namespace ${isNamespaceMandatory ? '*' : ''}`} />
-            </div>
-            {!isNamespaceMandatory && <><div className="form__row form__row--ignore-namespace">
-                <input type="checkbox" onChange={e => { setIngore(t => !t); setIngoreError("") }} checked={ignore} />
-                <div className="form__label bold">Ignore namespace</div>
-            </div>
-                <div className="form__row form__row--warn">
-                    If left empty, you won't be able to add more
-                    environments to this cluster
-                </div>
-                {ignoreError && <div className="form__row form__error">{ignoreError}</div>}
-            </>}
-            <div className="form__row">
-                <div className="form__label">Environment type*</div>
-                <div className="environment-type pointer">
-                    <div className="flex left environment environment--production">
-                        <label className="form__label"><input type="radio" name="isProduction" checked={state.isProduction.value === 'true'} value="true" onChange={handleOnChange} /><span>Production</span></label>
-                    </div>
-                    <div className="flex left environment environment--non-production">
-                        <label className="form__label"><input type="radio" name="isProduction" checked={state.isProduction.value === 'false'} value="false" onChange={handleOnChange} /><span>Non - Production</span></label>
-                    </div>
-                </div>
-            </div>
-            <div className="form__buttons">
-                <button className="cta" type="submit" disabled={loading}>{loading ? <Progressing /> : id ? 'Update' : 'Save'}</button>
-            </div>
-        </form>
-    </VisibleModal>
 }

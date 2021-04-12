@@ -7,14 +7,14 @@ import { overRideSecret, deleteSecret as deleteEnvironmentSecret, unlockEnvSecre
 import { toast } from 'react-toastify';
 import { KeyValueInput, useKeyValueYaml, validateKeyValuePair } from '../configMaps/ConfigMap'
 import { getSecretList } from '../../services/service';
-import CodeEditor from '../CodeEditor/CodeEditor'
 import { DOCUMENTATION, PATTERNS } from '../../config';
-import YAML from 'yaml'
-import keyIcon from '../../assets/icons/ic-key.svg'
-import addIcon from '../../assets/icons/ic-add.svg'
-import arrowTriangle from '../../assets/icons/appstatus/ic-dropdown.svg'
 import { ReactComponent as Trash } from '../../assets/icons/ic-delete.svg';
 import { KeyValueFileInput } from '../util/KeyValueFileInput';
+import CodeEditor from '../CodeEditor/CodeEditor';
+import YAML from 'yaml';
+import keyIcon from '../../assets/icons/ic-key.svg';
+import addIcon from '../../assets/icons/ic-add.svg';
+import arrowTriangle from '../../assets/icons/appstatus/ic-dropdown.svg';
 import '../configMaps/ConfigMap.scss';
 
 let sampleJSON = [{
@@ -106,9 +106,9 @@ const Secret = ({ respondOnSuccess, ...props }) => {
     return (
         <div className="form__app-compose">
             <h1 className="form__title form__title--artifacts">Secrets</h1>
-            <p className="form__subtitle form__subtitle--artifacts">A Secret is an object that contains sensitive data such as passwords, OAuth tokens, and SSH keys.
-            <a className="learn-more__href" rel="noreferer noopener" href={DOCUMENTATION.APP_CREATE_SECRET} target="blank"> Learn more about Secrets</a></p>
-            <CollapsedSecretForm appId={appId} id={list.id || 0} title="Add Secret" appChartRef={appChartRef} update={update} initialise={initialise} />
+            <p className="form__subtitle form__subtitle--artifacts">A Secret is an object that contains sensitive data such as passwords, OAuth tokens, and SSH keys.</p>
+            <a className="learn-more__href" rel="noreferer noopener" href={DOCUMENTATION.APP_CREATE_SECRET} target="blank"> Learn more about Secrets</a>
+            {list && <CollapsedSecretForm appId={appId} id={list.id || 0} title="Add Secret" appChartRef={appChartRef} update={update} initialise={initialise} />}
             {list && Array.isArray(list.configData) && list.configData.filter(cs => cs).map((cs, idx) => <CollapsedSecretForm key={cs.name}
                 {...cs}
                 appChartRef={appChartRef}
@@ -200,7 +200,7 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
     const [loading, setLoading] = useState(false)
     const [secretMode, toggleSecretMode] = useState(props.isUpdate)
     const [externalType, setExternalType] = useState(props.externalType)
-    const { appId, envId } = useParams<{ appId, envId }>()
+    const { appId, envId } = useParams<{ appId, envId }>();
     const [yamlMode, toggleYamlMode] = useState(true)
     const { yaml, handleYamlChange, error } = useKeyValueYaml(externalValues, setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
     const { yaml: lockedYaml } = useKeyValueYaml(externalValues.map(({ k, v }) => ({ k, v: Array(8).fill("*").join("") })), setKeyValueArray, PATTERNS.CONFIG_MAP_AND_SECRET_KEY, `Key must consist of alphanumeric characters, '.', '-' and '_'`)
@@ -560,7 +560,7 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 label={"Volume mount path*"}
                 placeholder={"Enter mount path"}
                 helperText={"keys are mounted as files to volume"}
-                error={volumeMountPath.error}
+                error={[{ name: volumeMountPath.error }]}
                 onChange={e => setVolumeMountPath({ value: e.target.value, error: "" })} />
         </div> : null}
         {isExternalValues && selectedTab === 'Data Volume' ?
@@ -613,7 +613,7 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 label={""}
                 disabled={isChartVersion309OrBelow}
                 placeholder={"eg. 0400 or 400"}
-                error={filePermissionValue.error}
+                error={[{ name: filePermissionValue.error }]}
                 onChange={(e) => setFilePermissionValue({ value: e.target.value, error: "" })}
             />
         </div> : ""}
@@ -623,7 +623,7 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 tabIndex={4}
                 label={"Role ARN"}
                 placeholder={"Enter Role ARN"}
-                error={roleARN.error}
+                error={[{ name: roleARN.error }]}
                 onChange={event => handleRoleARNChange(event)} />
         </div> : null}
         {isExternalValues && <div className="flex left mb-16">
@@ -709,13 +709,12 @@ export const SecretForm: React.FC<SecretFormProps> = function (props) {
                 if (isHashiOrAWS) { setSecretData((secretData) => [...secretData, { fileName: "", property: "", isBinary: true, name: "" }]) }
                 else setExternalValues((externalValues) => [...externalValues, { k: "", v: "", keyError: "", valueError: "" }])
             }}>
-            <img src={addIcon} alt="add" />
-                Add parameter
+                <img src={addIcon} alt="add" />Add parameter
             </div>}
         <div className="form__buttons">
             <button type="button" className="cta" onClick={handleSubmit}>{loading ? <Progressing /> : `${props.name ? 'Update' : 'Save'} Secret`}</button>
         </div>
-    </div >
+    </div>
 }
 
 export default Secret

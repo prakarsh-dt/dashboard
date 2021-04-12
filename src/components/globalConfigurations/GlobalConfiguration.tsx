@@ -34,7 +34,7 @@ const ConfigRequired = [
 ]
 
 const ConfigOptional = [
-    { name: 'Chart Repositories', href: URLS.GLOBAL_CONFIG_CHART, component: ChartRepo },
+    { name: 'Chart repositories', href: URLS.GLOBAL_CONFIG_CHART, component: ChartRepo },
     { name: 'SSO login services', href: URLS.GLOBAL_CONFIG_LOGIN, component: SSOLogin },
     { name: 'User access', href: URLS.GLOBAL_CONFIG_AUTH, component: UserGroup },
     { name: 'Notifications', href: URLS.GLOBAL_CONFIG_NOTIFIER, component: Notifier },
@@ -204,7 +204,7 @@ function Logo({ src = "", style = {}, className = "", children = null }) {
 
 function Title({ title = "", subtitle = "", style = {}, className = "", tag = "", ...props }) {
     return <div className="flex column left">
-        <div className={`list__title ${className}`}>{title} {tag && <span className="tag">{tag}</span>}</div>
+        <div className={`fs-14 cn-9 ${className}`}>{title} {tag && <span className="tag">{tag}</span>}</div>
         {subtitle && <div className={`list__subtitle ${className}`}>{subtitle}</div>}
     </div>
 }
@@ -226,7 +226,7 @@ export function List({ children = null, className = "", ...props }) {
 
 export function CustomInput({ name, value, error, onChange, label, type = "text", disabled = false, autoComplete = "off", labelClassName = "" }) {
     return <div className="flex column left top">
-        <label className={`form__label ${labelClassName}`} >{label}</label>
+        <label className={`form__label ${labelClassName}`}>{label}</label>
         <input type={type}
             name={name}
             autoComplete="off"
