@@ -17,7 +17,9 @@ export const AppStatusModal: React.FC<{
     const [nodeStatusMap, setNodeStatusMap] = useState(new Map());
     const [rows, setRows] = useState([]);
     const [showMore, toggleShowMore] = useState(false);
+    const [height, setHeight] = useState<number>(41)
     const errorMessageRef = useRef(null)
+    const containerMessageRef = useRef(null)
 
     useEffect(() => {
         const stats = streamData?.result?.application?.status?.operationState?.syncResult?.resources?.reduce(
@@ -56,13 +58,19 @@ export const AppStatusModal: React.FC<{
         return '';
     }
 
+    function handleShowMore(event) {
+        let newHeight = !showMore ? errorMessageRef.current.height : 41
+        toggleShowMore(!showMore);
+        setHeight(newHeight);
+    }
+
     return <Drawer position="right" width="1100px" onClose={close}>
         <div className="app-details-status-modal bcn-0" onClick={(e) => e.stopPropagation()}>
             <div className="" style={{ borderBottom: "1px solid #d0d4d9" }}>
                 <div className="flex flex-align-center flex-justify" >
                     <div className="">
                         <h2 className="mt-12 mb-0 pl-20 pr-20 fs-16 lh-1-5 fw-6">App status detail: {appName} / {environmentName}</h2>
-                        <p className={`m-0 pl-20 pr-20 text-uppercase app-summary__status-name fs-12 fw-6 f-${status.toLowerCase()}`}>{status.toUpperCase()}</p>
+                        <p className={`m-0 pl-20 pr-20 text-uppercase app-summary__status-name mb-8 fs-12 fw-6 f-${status.toLowerCase()}`}>{status.toUpperCase()}</p>
                         {message && status?.toLowerCase() !== "degraded" && <div className="mt-4 mb-12 pl-20 pr-20 fs-12 fw-5 lh-1-5">{message}</div>}
                     </div>
                     <button type="button" className="transparent flex icon-dim-24" onClick={close}>
@@ -70,13 +78,14 @@ export const AppStatusModal: React.FC<{
                     </button>
                 </div>
                 {message && status?.toLowerCase() === "degraded" && <div className="bcr-1 pl-20 pr-20 pt-12 pb-12 mt-12">
-                    <div className={`cn-9 app-status__error-msg ${showMore ? "app-status__error-msg--auto-height" : ""}`}>
+                    <div ref={containerMessageRef} style={{ height: `${height}` }}
+                        className={`cn-9 app-status__error-msg app-status__error-msg--auto-height`}>
                         <Error className="icon-dim-20" />
-                        <p ref={errorMessageRef} className={`m-0 fs-13 fw-5 lh-1-54`}>
-                            <span className="fw-6">Error</span>: {message}
+                        <p ref={errorMessageRef} className={`m-0 fs-13 fw-5 lh-1-54 app-status__error`}>
+                            <span className="fw-6">Error</span>: {message}  {message}  {message}
                         </p>
                     </div>
-                    {errorMessageRef?.current?.clientHeight > 40 && <button type="button" className="ml-32 cb-5 fw-6 transparent" onClick={(e) => toggleShowMore(!showMore)}>
+                    {errorMessageRef?.current?.scrollHeight > containerMessageRef?.current?.clientHeight && <button type="button" className="ml-32 cb-5 fw-6 transparent" onClick={handleShowMore}>
                         {showMore ? "Show less" : "Show more"}
                     </button>}
                 </div>}

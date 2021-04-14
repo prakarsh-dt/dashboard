@@ -1730,10 +1730,5 @@ table.resource-tree {
     display: grid;
     grid-template-columns: 20px auto;
     gap: 12px;
-    height: 40px;
     overflow: hidden;
-}
-
-.app-status__error-msg--auto-height {
-    height: auto;
 }
